@@ -1,0 +1,4 @@
+lister_quick_reload:
+    path: /lister/async/quick/{uuid}
+    defaults: {_controller: "DszczerListerBundle:Async:quick"}
+    methods: [POST]

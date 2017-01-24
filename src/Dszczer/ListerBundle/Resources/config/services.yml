@@ -1,0 +1,11 @@
+services:
+    lister.factory:
+        class: Dszczer\ListerBundle\Lister\Factory
+        arguments: ['@form.factory', '@router', '%lister_config%']
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
+    lister.twig_extension:
+        class: Dszczer\ListerBundle\Twig\ListerExtension
+        tags:
+            - { name: twig.extension }

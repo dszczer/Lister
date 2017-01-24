@@ -1,0 +1,26 @@
+{
+  "name": "dszczer/lister",
+  "description": "Powerful data view model generator",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Damian Szczerbiński",
+      "email": "dszczer@gmail.com"
+    }
+  ],
+  "require": {
+    "php": "^7.0",
+    "propel/propel": "~2.0@dev",
+    "propel/propel-bundle": "~2.0@dev",
+    "symfony/symfony": "^2.8|^3.0"
+  },
+  "require-dev": {
+    "phpdocumentor/phpdocumentor": "2.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "": "src/"
+    }
+  }
+}

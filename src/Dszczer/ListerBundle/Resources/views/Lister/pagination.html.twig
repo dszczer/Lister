@@ -1,0 +1,24 @@
+<ul class="lister-pagination" id="{{ list.id }}Pagination">
+    {% if pagination.haveToPaginate %}
+        {% set links = pagination.links(list.customOptions.maxLinks) %}
+        <li class="{{ pagination.isFirstPage ? 'active' : '' }}">
+            <a href="{{ path(list.customOptions.route, list.customOptions.params) }}">1</a>
+        </li>
+        {% if links[0] > 2 %}
+            <li class="disabled"><a href="#" onclick="return false">...</a></li>
+        {% endif %}
+        {% for i in links %}
+            {% if i > 1 and i < pagination.getLastPage %}
+                <li class="{{ pagination.page == i ? 'active' : '' }}">
+                    <a href="{{ path(list.customOptions.route, list.customOptions.params|merge({(list.pageRequestParameterName): i})) }}">{{ i }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+        {% if links[links|length - 1] < pagination.getLastPage - 1 %}
+            <li class="disabled"><a href="#" onclick="return false">...</a></li>
+        {% endif %}
+        <li class="{{ pagination.isLastPage ? 'active' : '' }}">
+            <a href="{{ path(list.customOptions.route, list.customOptions.params|merge({(list.pageRequestParameterName): pagination.getLastPage})) }}">{{ pagination.getLastPage }}</a>
+        </li>
+    {% endif %}
+</ul>

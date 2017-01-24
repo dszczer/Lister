@@ -1,0 +1,5 @@
+<tr data-id="{{ row.id }}">
+    {% for element in elements %}
+        <td>{{ element.data|raw }}</td>
+    {% endfor %}
+</tr>

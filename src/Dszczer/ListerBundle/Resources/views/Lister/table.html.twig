@@ -1,0 +1,36 @@
+<table class="lister-table" id="{{ list.id }}">
+    <thead>
+    <tr>
+        {% for element in list.elements %}
+            <th>
+                {% if list.hasSorter(element.name) %}
+                    {{ form(list.sorterForm(element.name).createView) }}
+                {% else %}
+                    {{ element.label|trans([], list.translationDomain) }}
+                {% endif %}
+            </th>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for elements in list.hydratedElements if results.count > 0 %}
+        {% include list.elementLayout with {elements: elements, row: elements[0].data(true)} %}
+    {%  else %}
+        <tr><td colspan="{{ list.elements|length }}">{{ 'List is empty'|trans([], list.translationDomain) }}</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% if list.dynamic and not app.request.xmlHttpRequest %}
+    <script type="text/javascript">
+      if (typeof listerListDefs === "undefined") {
+        var listerListDefs = [];
+      }
+      listerListDefs.push({
+        filterContainerId: {{- list.filterForm ? ('"' ~ list.id ~ 'Filters"')|raw : 'null' -}},
+        listContainerId: "{{- list.id -}}",
+        paginationContainerId: {{- list.pager.haveToPaginate ? ('"' ~ list.id ~ 'Pagination"')|raw : 'null' -}}
+      });
+    </script>
+    <!-- It is the best to place below resource right before </body> tag -->
+    <script type="text/javascript" src="{{ asset('bundles/dszczerlister/js/lister.js') }}" defer async></script>
+{% endif %}
