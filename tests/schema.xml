@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<database name="lister_test" defaultIdMethod="native" namespace="Dszczer\ListerBundle" identifierQuoting="true"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://xsd.propelorm.org/1.6/database.xsd">
+
+    <vendor type="sqlite">
+        <parameter name="engine" value="InnoDB"/>
+    </vendor>
+
+    <table name="author" idMethod="native">
+        <column name="id" type="integer" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="first_name" type="varchar" size="50" required="true"/>
+        <column name="last_name" type="varchar" size="75" required="true"/>
+        <column name="email" type="varchar" size="150" required="true"/>
+    </table>
+
+    <table name="book" idMethod="native">
+        <column name="id" type="integer" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="author_id" type="integer" required="true"/>
+        <column name="title" type="varchar" size="255" required="true"/>
+        <column name="isbn" type="varchar" size="60" required="true"/>
+
+        <foreign-key foreignTable="author">
+            <reference local="author_id" foreign="id"/>
+        </foreign-key>
+    </table>
+</database>

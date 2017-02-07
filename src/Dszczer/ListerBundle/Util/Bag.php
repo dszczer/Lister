@@ -79,7 +79,7 @@ class Bag implements \IteratorAggregate, \Countable
      * @return mixed|null
      * @throws \InvalidArgumentException
      */
-    public function get(string $key, $default = null)
+    public function get($key, $default = null)
     {
         return array_key_exists($key, $this->array) ? $this->array[$key] : $default;
     }
@@ -89,7 +89,7 @@ class Bag implements \IteratorAggregate, \Countable
      * @param string $key The key
      * @param mixed $value The value
      */
-    public function set(string $key, $value)
+    public function set($key, $value)
     {
         $this->validateInstance($value);
         $this->array[$key] = $value;
@@ -100,7 +100,7 @@ class Bag implements \IteratorAggregate, \Countable
      * @param string $key The key
      * @return bool true if the parameter exists, false otherwise
      */
-    public function has(string $key): bool
+    public function has($key)
     {
         return array_key_exists($key, $this->array);
     }
@@ -109,7 +109,7 @@ class Bag implements \IteratorAggregate, \Countable
      * Removes a parameter.
      * @param string $key The key
      */
-    public function remove(string $key)
+    public function remove($key)
     {
         unset($this->array[$key]);
     }
@@ -118,7 +118,7 @@ class Bag implements \IteratorAggregate, \Countable
      * Returns an iterator for array.
      * @return \ArrayIterator An \ArrayIterator instance
      */
-    public function getIterator(): \ArrayIterator
+    public function getIterator()
     {
         return new \ArrayIterator($this->array);
     }
@@ -127,7 +127,7 @@ class Bag implements \IteratorAggregate, \Countable
      * Returns the number of array.
      * @return int The number of array
      */
-    public function count(): int
+    public function count()
     {
         return count($this->array);
     }
@@ -136,7 +136,7 @@ class Bag implements \IteratorAggregate, \Countable
      * Get class name to validate against.
      * @return string
      */
-    public function getInstanceValidator(): string
+    public function getInstanceValidator()
     {
         return $this->instanceValidator;
     }
@@ -144,10 +144,14 @@ class Bag implements \IteratorAggregate, \Countable
     /**
      * Set class name to validate against.
      * @param string $instanceValidator
+     * @throws \InvalidArgumentException
      */
-    public function setInstanceValidator(string $instanceValidator)
+    public function setInstanceValidator($instanceValidator)
     {
         $this->instanceValidator = $instanceValidator;
+        if($this->count() > 0) {
+            $this->validateInstance($this->array);
+        }
     }
 
     /**
@@ -161,19 +165,28 @@ class Bag implements \IteratorAggregate, \Countable
         if ($this->instanceValidator && class_exists($this->instanceValidator)) {
             if (is_array($data)) {
                 foreach ($data as $key => $item) {
-                    if (!$item instanceof $this->instanceValidator) {
+                    if(!is_object($data)) {
+                        throw new \InvalidArgumentException("Data is not an object");
+                    } elseif (!$item instanceof $this->instanceValidator) {
                         throw new \InvalidArgumentException(
-                            'Data is instance of "'.get_class(
-                                $data
-                            ).'", should be "'.$this->instanceValidator.'" at '.$key
+                            sprintf(
+                                'Data is instance of "%s", should be "%s" at "%s" key',
+                                get_class($data),
+                                $this->instanceValidator,
+                                $key
+                            )
                         );
                     }
                 }
+            } elseif(!is_object($data)) {
+                throw new \InvalidArgumentException("Data is not an object");
             } elseif (!$data instanceof $this->instanceValidator) {
                 throw new \InvalidArgumentException(
-                    'Data is instance of "'.get_class(
-                        $data
-                    ).'", should be "'.$this->instanceValidator.'"'
+                    sprintf(
+                        'Data is instance of "%s", should be "%s"',
+                        get_class($data),
+                        $this->instanceValidator
+                    )
                 );
             }
         }

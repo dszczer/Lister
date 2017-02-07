@@ -39,16 +39,16 @@ class Element
      * @param mixed $data Data to display
      */
     public function __construct(
-        string $name = '',
-        string $label = '',
-        string $method = '',
-        callable $callable = null,
+        $name = '',
+        $label = '',
+        $method = '',
+        $callable = null,
         $data = null
     ) {
         $this->name = $name;
         $this->label = $label;
         $this->callable = $callable;
-        $this->data;
+        $this->data = $data;
         $this->custom = is_callable($callable);
 
         if (empty($method) && !empty($name) && !$this->custom) {
@@ -63,17 +63,27 @@ class Element
      * Get data to render.
      * @param bool $raw Return unprocessed data.
      * @return mixed
+     * @throws ElementException
      */
-    public function getData(bool $raw = false)
+    public function getData($raw = false)
     {
-        if ($raw) {
-            return $this->data;
-        }
-        if ($this->isCustom()) {
-            return call_user_func_array($this->getCallable(), [$this]);
+        if (!$raw) {
+            if ($this->isCustom()) {
+                try {
+                    return call_user_func_array($this->getCallable(), [$this]);
+                } catch (\Throwable $throwable) {
+                    throw new ElementException("Error while calling custom callable", 0, $throwable);
+                }
+            } elseif (is_object($this->data)) {
+                try {
+                    return $this->data->{$this->elementMethod}();
+                } catch (\Throwable $throwable) {
+                    throw new ElementException("Error while calling method ".$this->elementMethod, 0, $throwable);
+                }
+            }
         }
 
-        return is_object($this->data) ? $this->data->{$this->elementMethod}() : $this->data;
+        return $this->data;
     }
 
     /**
@@ -81,7 +91,7 @@ class Element
      * @param mixed $data
      * @return Element
      */
-    public function setData($data): ELement
+    public function setData($data)
     {
         $this->data = $data;
 
@@ -92,7 +102,7 @@ class Element
      * Get name of $this Element.
      * @return string
      */
-    public function getName(): string
+    public function getName()
     {
         return $this->name;
     }
@@ -102,7 +112,7 @@ class Element
      * @param string $name
      * @return Element
      */
-    public function setName(string $name): Element
+    public function setName($name)
     {
         $this->name = $name;
 
@@ -113,7 +123,7 @@ class Element
      * Get displayable Label name of $this Element.
      * @return string
      */
-    public function getLabel(): string
+    public function getLabel()
     {
         return $this->label;
     }
@@ -123,7 +133,7 @@ class Element
      * @param string $label
      * @return Element
      */
-    public function setLabel(string $label): Element
+    public function setLabel($label)
     {
         $this->label = $label;
 
@@ -134,7 +144,7 @@ class Element
      * Get method name to call on object when retriving data to render.
      * @return string
      */
-    public function getMethod(): string
+    public function getMethod()
     {
         return $this->elementMethod;
     }
@@ -144,7 +154,7 @@ class Element
      * @param string $method
      * @return Element
      */
-    public function setMethod(string $method): Element
+    public function setMethod($method)
     {
         $this->default = false;
         $this->elementMethod = $method;
@@ -166,7 +176,7 @@ class Element
      * @param callable $callable
      * @return Element
      */
-    public function setCallable(callable $callable): Element
+    public function setCallable($callable)
     {
         $this->callable = $callable;
 
@@ -178,7 +188,7 @@ class Element
      * @param bool $state True for callable, false for method.
      * @return Element
      */
-    public function setCustom(bool $state): Element
+    public function setCustom($state)
     {
         $this->custom = $state && is_callable($this->callable);
 
@@ -189,7 +199,7 @@ class Element
      * Check if Element has callable source of data.
      * @return bool
      */
-    public function isCustom(): bool
+    public function isCustom()
     {
         return $this->custom;
     }
@@ -198,7 +208,7 @@ class Element
      * Check if method is a default Model generated stub.
      * @return bool True for name-based method name, false for defined one.
      */
-    public function isDefaultMethod(): bool
+    public function isDefaultMethod()
     {
         return $this->default;
     }

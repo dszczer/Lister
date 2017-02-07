@@ -36,7 +36,7 @@ class Sorter
      * @param string $method Method to call when applying sorter
      * @param mixed $value Value passed to method
      */
-    public function __construct(string $name = '', string $label = '', string $method = '', $value = null)
+    public function __construct($name = '', $label = '', $method = '', $value = null)
     {
         $this->name = $name;
         $this->label = $label;
@@ -54,7 +54,7 @@ class Sorter
      * Get sorter name.
      * @return string
      */
-    public function getName(): string
+    public function getName()
     {
         return $this->name;
     }
@@ -64,7 +64,7 @@ class Sorter
      * @param string $name
      * @return Sorter
      */
-    public function setName(string $name): Sorter
+    public function setName($name)
     {
         $this->name = $name;
 
@@ -85,7 +85,7 @@ class Sorter
      * @param string $label
      * @return Sorter
      */
-    public function setLabel(string $label): Sorter
+    public function setLabel($label)
     {
         $this->label = $label;
 
@@ -106,7 +106,7 @@ class Sorter
      * @param mixed $value
      * @return Sorter
      */
-    public function setValue($value): Sorter
+    public function setValue($value)
     {
         $this->value = $value;
 
@@ -117,7 +117,7 @@ class Sorter
      * Get method name.
      * @return string
      */
-    public function getSorterMethod(): string
+    public function getSorterMethod()
     {
         return $this->sorterMethod;
     }
@@ -127,7 +127,7 @@ class Sorter
      * @param string $sorterMethod
      * @return Sorter
      */
-    public function setSorterMethod(string $sorterMethod): Sorter
+    public function setSorterMethod($sorterMethod)
     {
         $this->default = false;
         $this->sorterMethod = $sorterMethod;
@@ -139,7 +139,7 @@ class Sorter
      * Check if method is defined or not.
      * @return bool True for defined method, false for default generated stub
      */
-    public function isDefaultMethod(): bool
+    public function isDefaultMethod()
     {
         return $this->default;
     }

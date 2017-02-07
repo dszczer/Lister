@@ -17,7 +17,7 @@ abstract class Helper
      * Generates UUIDv4 unique identifier as string.
      * @return string
      */
-    public static function uuidv4(): string
+    public static function uuidv4()
     {
         return sprintf(
             '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
@@ -51,7 +51,7 @@ abstract class Helper
      * @param string $separator Separator of words
      * @return string
      */
-    public static function camelize(string $input, string $separator = '_'): string
+    public static function camelize($input, $separator = '_')
     {
         return lcfirst(str_replace($separator, '', ucwords(str_replace(' ', $separator, $input), $separator)));
     }
@@ -61,7 +61,7 @@ abstract class Helper
      * @param string $path Symfony-like twig path
      * @return string
      */
-    public static function fixTwigTemplatePath(string $path): string
+    public static function fixTwigTemplatePath($path)
     {
         return str_replace([':', 'Bundle'], ['/', ''], $path);
     }
@@ -73,7 +73,7 @@ abstract class Helper
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    public static function encodeAnything($source): string
+    public static function encodeAnything($source)
     {
         if (is_resource($source)) {
             throw new \InvalidArgumentException('Object is not valid to encode');
@@ -102,7 +102,7 @@ abstract class Helper
      * @throws \Exception
      * @throws \InvalidArgumentException
      */
-    public static function decodeAnything(string $source)
+    public static function decodeAnything($source)
     {
         try {
             $decoded = json_decode($source, true);
@@ -111,11 +111,13 @@ abstract class Helper
             }
 
             return $decoded;
-        } catch (\Throwable $exception) {}
+        } catch (\Throwable $exception) {
+        }
 
         try {
             return unserialize($source);
-        } catch (\Throwable $exception) {}
+        } catch (\Throwable $exception) {
+        }
 
         throw new \InvalidArgumentException('Source is not valid encoded string', E_USER_ERROR, $exception);
     }

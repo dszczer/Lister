@@ -20,7 +20,7 @@ class ListerExtension extends \Twig_Extension
      * Get all extension functions.
      * @see \Twig_Extension
      */
-    public function getFunctions(): array
+    public function getFunctions()
     {
         return [
             new \Twig_SimpleFunction(
@@ -50,7 +50,7 @@ class ListerExtension extends \Twig_Extension
      * @param Lister $list
      * @return string
      */
-    public function listerFiltersFunction(\Twig_Environment $env, Lister $list): string
+    public function listerFiltersFunction(\Twig_Environment $env, Lister $list)
     {
         $form = $list->getFilterForm();
 
@@ -66,7 +66,7 @@ class ListerExtension extends \Twig_Extension
      * @param Lister $list
      * @return string
      */
-    public function listerBodyFunction(\Twig_Environment $env, Lister $list): string
+    public function listerBodyFunction(\Twig_Environment $env, Lister $list)
     {
         return $env->render($list->getListLayout(), ['list' => $list, 'results' => $list->getPager()->getResults()]);
     }
@@ -77,7 +77,7 @@ class ListerExtension extends \Twig_Extension
      * @param Lister $list
      * @return string
      */
-    public function listerPaginationFunction(\Twig_Environment $env, Lister $list): string
+    public function listerPaginationFunction(\Twig_Environment $env, Lister $list)
     {
         return $env->render($list->getPaginationLayout(), [
             'list' => $list,
@@ -89,7 +89,7 @@ class ListerExtension extends \Twig_Extension
      * Returns the name of the extension.
      * @return string The extension name
      */
-    public function getName(): string
+    public function getName()
     {
         return 'lister_twig_extension';
     }

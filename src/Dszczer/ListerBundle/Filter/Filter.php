@@ -53,10 +53,10 @@ class Filter
      * @throws FilterException
      */
     public function __construct(
-        string $type,
-        string $name = '',
-        string $label = '',
-        string $method = '',
+        $type,
+        $name = '',
+        $label = '',
+        $method = '',
         $value = null,
         array $values = []
     )
@@ -82,7 +82,7 @@ class Filter
      * @param bool $className true for Symfony Type's full class name or false for constant string one
      * @return string
      */
-    public function getType(bool $className = true): string
+    public function getType($className = true)
     {
         if ($className) {
             // cannot use switch syntax because of condition order
@@ -111,7 +111,7 @@ class Filter
      * @return Filter
      * @throws FilterException
      */
-    public function setType(string $type): Filter
+    public function setType($type)
     {
         $this->type = $type;
         $this->checkType();
@@ -134,7 +134,7 @@ class Filter
      * Get name of $this Filter.
      * @return string
      */
-    public function getName(): string
+    public function getName()
     {
         return $this->name;
     }
@@ -144,7 +144,7 @@ class Filter
      * @param string $name
      * @return Filter
      */
-    public function setName(string $name): Filter
+    public function setName($name)
     {
         $this->name = $name;
 
@@ -155,7 +155,7 @@ class Filter
      * Get label of filter's form field.
      * @return string
      */
-    public function getLabel(): string
+    public function getLabel()
     {
         return $this->label;
     }
@@ -165,7 +165,7 @@ class Filter
      * @param string $label
      * @return Filter
      */
-    public function setLabel(string $label): Filter
+    public function setLabel($label)
     {
         $this->label = $label;
 
@@ -186,7 +186,7 @@ class Filter
      * @param mixed $value
      * @return Filter
      */
-    public function setValue($value): Filter
+    public function setValue($value)
     {
         $this->value = $value;
 
@@ -197,7 +197,7 @@ class Filter
      * Get enum values to use as filter value.
      * @return array
      */
-    public function getValues(): array
+    public function getValues()
     {
         return $this->values;
     }
@@ -207,9 +207,9 @@ class Filter
      * @param array $values
      * @return Filter
      */
-    public function setValues(array $values): Filter
+    public function setValues(array $values)
     {
-        $this->value = $values;
+        $this->values = $values;
 
         return $this;
     }
@@ -218,7 +218,7 @@ class Filter
      * Get filter method name to call when applying filter.
      * @return string
      */
-    public function getFilterMethod(): string
+    public function getFilterMethod()
     {
         return $this->filterMethod;
     }
@@ -228,7 +228,7 @@ class Filter
      * @param string $filterMethod
      * @return Filter
      */
-    public function setFilterMethod(string $filterMethod): Filter
+    public function setFilterMethod($filterMethod)
     {
         $this->default = false;
         $this->filterMethod = $filterMethod;
@@ -240,7 +240,7 @@ class Filter
      * Check if method name is set or not.
      * @return bool True for default generated Model method stub, false for defined one.
      */
-    public function isDefaultMethod(): bool
+    public function isDefaultMethod()
     {
         return $this->default;
     }

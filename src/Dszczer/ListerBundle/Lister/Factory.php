@@ -52,7 +52,7 @@ class Factory
      * @param string $translationDomain
      * @return Lister
      */
-    public function createList(string $modelClass, string $id = '', string $translationDomain = 'lister'): Lister
+    public function createList($modelClass, $id = '', $translationDomain = 'lister')
     {
         $list = null;
         if ($this->request instanceof Request && $this->request->hasSession()) {
@@ -69,7 +69,7 @@ class Factory
 
         $formNamePrefix = empty($this->config['form_name_prefix'])
             ? $list->getId()
-            : $this->config['form_name_prefix'].'_'.$list->getId();
+            : ($this->config['form_name_prefix'].'_'.$list->getId());
         /** @var FormBuilder $builder */
         $builder = $this->formFactory->createNamedBuilder(
             $formNamePrefix,

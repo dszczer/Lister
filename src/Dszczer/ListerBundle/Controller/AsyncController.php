@@ -25,12 +25,13 @@ class AsyncController extends Controller
      * @param string $uuid Identifier of the list.
      * @return JsonResponse Response to handle by JavaScript.
      */
-    public function quickAction(Request $request, string $uuid): JsonResponse
+    public function quickAction(Request $request, $uuid)
     {
         try {
             if (!Lister::getFromSession($request->getSession(), $uuid) instanceof Lister) {
                 throw new \RuntimeException("$uuid is not a persisted list");
             }
+            /** @var Lister $list */
             $list = $this->get('lister.factory')->createList('', $uuid);
             $list->apply($request);
             $pager = $list->getPager();
@@ -87,9 +88,10 @@ class AsyncController extends Controller
      * @return mixed Value returned by called function
      * @throws \Twig_Error_Runtime Twig error
      */
-    private function callTwigFunction(string $name, array $argv)
+    private function callTwigFunction($name, array $argv)
     {
         $env = $this->get('twig');
+        /** @var \Twig_SimpleFunction $function */
         $function = $env->getFunction($name);
 
         if (!$function) {

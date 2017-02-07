@@ -86,7 +86,7 @@ class Lister
      * @param string $id Unique identifier
      * @param string $modelClass Full class name of ModelCriteria's child object
      */
-    public function __construct(string $id = '', string $modelClass = '')
+    public function __construct($id = '', $modelClass = '')
     {
         if (!empty($modelClass)) {
             $query = new $modelClass();
@@ -114,7 +114,7 @@ class Lister
      * @param string $uuid ID of the list to read from
      * @return Lister|null Lister for found one, null for not
      */
-    public static function getFromSession(SessionInterface $session, string $uuid)
+    public static function getFromSession(SessionInterface $session, $uuid)
     {
         if ($session->has(static::SERIALIZED_STORAGE_NAME)) {
             $lists = $session->get(static::SERIALIZED_STORAGE_NAME, []);
@@ -140,7 +140,7 @@ class Lister
      * @param string $uuid ID of the list to remove
      * @return bool True on success, false on failure
      */
-    public static function removeFromSession(SessionInterface $session, string $uuid): bool
+    public static function removeFromSession(SessionInterface $session, $uuid)
     {
         if ($session->has(static::SERIALIZED_STORAGE_NAME)) {
             $lists = $session->get(static::SERIALIZED_STORAGE_NAME, []);
@@ -174,7 +174,7 @@ class Lister
      * @param bool $overwrite Overwrite existing object with same list's ID
      * @return bool True on success, false on failure
      */
-    public function storeInSession(SessionInterface $session, bool $overwrite = true): bool
+    public function storeInSession(SessionInterface $session, $overwrite = true)
     {
         $lists = $session->get(static::SERIALIZED_STORAGE_NAME, []);
         if (!$this->isPersist() || (isset($lists[$this->id]) && !$overwrite)) {
@@ -190,7 +190,7 @@ class Lister
      * Check if list should use Javascript or be static
      * @return bool True for Javascript, false for static
      */
-    public function isDynamic(): bool
+    public function isDynamic()
     {
         return $this->dynamic;
     }
@@ -200,7 +200,7 @@ class Lister
      * @param bool $dynamic
      * @return Lister
      */
-    public function setDynamic(bool $dynamic): Lister
+    public function setDynamic($dynamic)
     {
         $this->dynamic = $dynamic;
 
@@ -234,7 +234,7 @@ class Lister
      * @param bool $clone True for cloned or false for original model criteria
      * @return ModelCriteria|null
      */
-    public function getQuery(bool $clone = true)
+    public function getQuery($clone = true)
     {
         return $clone && $this->query instanceof ModelCriteria ? clone $this->query : $this->query;
     }
@@ -244,7 +244,7 @@ class Lister
      * @param int $int
      * @return Lister
      */
-    public function setPerPage(int $int)
+    public function setPerPage($int)
     {
         $this->perpage = max(0, $int);
 
@@ -255,7 +255,7 @@ class Lister
      * Get quantity of ELements per one page.
      * @return int
      */
-    public function getPerPage(): int
+    public function getPerPage()
     {
         return $this->perpage;
     }
@@ -265,7 +265,7 @@ class Lister
      * @param bool $state
      * @return Lister
      */
-    public function setPersist(bool $state)
+    public function setPersist($state)
     {
         $this->persist = $state;
 
@@ -276,7 +276,7 @@ class Lister
      * Check if list can be stored in session.
      * @return bool
      */
-    public function isPersist(): bool
+    public function isPersist()
     {
         return $this->persist;
     }
@@ -285,7 +285,7 @@ class Lister
      * Get current displayed page.
      * @return int
      */
-    public function getCurrentPage(): int
+    public function getCurrentPage()
     {
         return $this->currentPage;
     }
@@ -294,7 +294,7 @@ class Lister
      * Get current displayed page HTTP GET parameter's name.
      * @return string
      */
-    public function getPageRequestParameterName(): string
+    public function getPageRequestParameterName()
     {
         return 'p_' . $this->getId();
     }
@@ -303,7 +303,7 @@ class Lister
      * Get id of list.
      * @return string
      */
-    public function getId(): string
+    public function getId()
     {
         return $this->id;
     }
@@ -325,17 +325,17 @@ class Lister
      * @return Lister
      */
     public function addField(
-        string $name,
-        string $label,
-        bool $sort = false,
-        string $filterType = '',
-        string $filterMethod = '',
+        $name,
+        $label,
+        $sort = false,
+        $filterType = '',
+        $filterMethod = '',
         $filterValue = null,
         array $filterValues = [],
-        string $sorterMethod = '',
+        $sorterMethod = '',
         $sorterValue = null,
-        string $elementMethod = '',
-        callable $elementCallable = null,
+        $elementMethod = '',
+        $elementCallable = null,
         $elementData = null
     )
     {
@@ -354,7 +354,7 @@ class Lister
      * Get array of filters.
      * @return Filter[]
      */
-    public function getFilters(): array
+    public function getFilters()
     {
         return $this->filters->all();
     }
@@ -364,7 +364,7 @@ class Lister
      * @param string $name
      * @return Filter|null
      */
-    public function getFilter(string $name)
+    public function getFilter($name)
     {
         return $this->filters->get($name);
     }
@@ -375,7 +375,7 @@ class Lister
      * @param bool $overwrite True for overwrite, false for merge (existing filters wll not be modified)
      * @return Lister
      */
-    public function setFilters(FilterBag $filters, bool $overwrite = false): Lister
+    public function setFilters(FilterBag $filters, $overwrite = false)
     {
         if ($overwrite) {
             $this->filters->replace($filters->all());
@@ -395,7 +395,7 @@ class Lister
      * @param bool $overwrite True for overwrite if exists, false to don't
      * @return Lister
      */
-    public function addFilter(Filter $filter, bool $overwrite = false): Lister
+    public function addFilter(Filter $filter, $overwrite = false)
     {
         if ($overwrite || !$this->hasFilter($filter)) {
             $this->filters->set($filter->getName(), $filter);
@@ -409,7 +409,7 @@ class Lister
      * @param string|Filter $name
      * @return bool
      */
-    public function hasFilter($name): bool
+    public function hasFilter($name)
     {
         return $this->filters->has($name instanceof Filter ? $name->getName() : $name);
     }
@@ -419,7 +419,7 @@ class Lister
      * @param string $name
      * @return Lister
      */
-    public function removeFilter(string $name): Lister
+    public function removeFilter($name)
     {
         $this->filters->remove($name);
 
@@ -430,7 +430,7 @@ class Lister
      * Get array of sorters.
      * @return Sorter[]
      */
-    public function getSorters(): array
+    public function getSorters()
     {
         return $this->sorters->all();
     }
@@ -440,7 +440,7 @@ class Lister
      * @param string $name
      * @return Sorter|null
      */
-    public function getSorter(string $name)
+    public function getSorter($name)
     {
         return $this->sorters->get($name);
     }
@@ -451,7 +451,7 @@ class Lister
      * @param bool $overwrite True for overwrite, false for merge (existing sorters will not be modified)
      * @return Lister
      */
-    public function setSorters(SorterBag $sorters, bool $overwrite = false): Lister
+    public function setSorters(SorterBag $sorters, $overwrite = false)
     {
         if ($overwrite) {
             $this->sorters->replace($sorters->all());
@@ -471,7 +471,7 @@ class Lister
      * @param bool $overwrite True for overwrite if exists, fals to don't
      * @return Lister
      */
-    public function addSorter(Sorter $sorter, bool $overwrite = false): Lister
+    public function addSorter(Sorter $sorter, $overwrite = false)
     {
         if ($overwrite || !$this->hasSorter($sorter)) {
             $this->sorters->set($sorter->getName(), $sorter);
@@ -485,7 +485,7 @@ class Lister
      * @param string|Sorter $name
      * @return bool
      */
-    public function hasSorter($name): bool
+    public function hasSorter($name)
     {
         return $this->sorters->has($name instanceof Sorter ? $name->getName() : $name);
     }
@@ -495,7 +495,7 @@ class Lister
      * @param string $name
      * @return Lister
      */
-    public function removeSorter(string $name): Lister
+    public function removeSorter($name)
     {
         $this->sorters->remove($name);
 
@@ -506,7 +506,7 @@ class Lister
      * Get array of elements.
      * @return Element[]
      */
-    public function getElements(): array
+    public function getElements()
     {
         return $this->elements->all();
     }
@@ -516,7 +516,7 @@ class Lister
      * @param string $name
      * @return Element|null
      */
-    public function getElement(string $name)
+    public function getElement($name)
     {
         return $this->elements->get($name);
     }
@@ -527,7 +527,7 @@ class Lister
      * @param bool $overwrite True for replace, false for merge (existing elements won't be modified)
      * @return Lister
      */
-    public function setElements(ElementBag $elements, bool $overwrite = false): Lister
+    public function setElements(ElementBag $elements, $overwrite = false)
     {
         if ($overwrite) {
             $this->elements->replace($elements->all());
@@ -547,7 +547,7 @@ class Lister
      * @param bool $overwrite True for overwrite if exists, false to don't
      * @return Lister
      */
-    public function addElement(Element $element, bool $overwrite = false)
+    public function addElement(Element $element, $overwrite = false)
     {
         if ($overwrite || !$this->hasElement($element->getName())) {
             $this->elements->set($element->getName(), $element);
@@ -561,7 +561,7 @@ class Lister
      * @param string $name
      * @return bool
      */
-    public function hasElement(string $name): bool
+    public function hasElement($name)
     {
         return $this->elements->has($name);
     }
@@ -571,7 +571,7 @@ class Lister
      * @param string $name
      * @return Lister
      */
-    public function removeElement(string $name)
+    public function removeElement($name)
     {
         $this->elements->remove($name);
 
@@ -583,7 +583,7 @@ class Lister
      * @param bool $raw Raw for bypass stored value, false for fixed Twig path.
      * @return string
      */
-    public function getFilterLayout(bool $raw = false): string
+    public function getFilterLayout($raw = false)
     {
         return $raw ? $this->filterLayout : Helper::fixTwigTemplatePath($this->filterLayout);
     }
@@ -593,7 +593,7 @@ class Lister
      * @param string $filterLayout Twig path to file.
      * @return Lister
      */
-    public function setFilterLayout(string $filterLayout): Lister
+    public function setFilterLayout($filterLayout)
     {
         $this->filterLayout = $filterLayout;
 
@@ -605,7 +605,7 @@ class Lister
      * @param bool $raw Raw for bypass stored value, false for fixed Twig path.
      * @return string
      */
-    public function getListLayout(bool $raw = false): string
+    public function getListLayout($raw = false)
     {
         return $raw ? $this->listLayout : Helper::fixTwigTemplatePath($this->listLayout);
     }
@@ -615,7 +615,7 @@ class Lister
      * @param string $listLayout
      * @return Lister
      */
-    public function setListLayout(string $listLayout): Lister
+    public function setListLayout($listLayout)
     {
         $this->listLayout = $listLayout;
 
@@ -627,7 +627,7 @@ class Lister
      * @param bool $raw Raw for bypass stored value, false for fixed Twig path.
      * @return string
      */
-    public function getElementLayout(bool $raw = false): string
+    public function getElementLayout($raw = false)
     {
         return $raw ? $this->elementLayout : Helper::fixTwigTemplatePath($this->elementLayout);
     }
@@ -637,7 +637,7 @@ class Lister
      * @param string $elementLayout
      * @return Lister
      */
-    public function setElementLayout(string $elementLayout): Lister
+    public function setElementLayout($elementLayout)
     {
         $this->elementLayout = $elementLayout;
 
@@ -649,7 +649,7 @@ class Lister
      * @param bool $raw Raw for bypass stored value, false for fixed Twig path.
      * @return string
      */
-    public function getPaginationLayout(bool $raw = false): string
+    public function getPaginationLayout($raw = false)
     {
         return $raw ? $this->paginationLayout : Helper::fixTwigTemplatePath($this->paginationLayout);
     }
@@ -659,7 +659,7 @@ class Lister
      * @param string $paginationLayout
      * @return Lister
      */
-    public function setPaginationLayout(string $paginationLayout): Lister
+    public function setPaginationLayout($paginationLayout)
     {
         $this->paginationLayout = $paginationLayout;
 
@@ -670,7 +670,7 @@ class Lister
      * Get translation domain.
      * @return string
      */
-    public function getTranslationDomain(): string
+    public function getTranslationDomain()
     {
         return $this->translationDomain;
     }
@@ -680,7 +680,7 @@ class Lister
      * @param string $domain
      * @return Lister
      */
-    public function setTranslationDomain(string $domain): Lister
+    public function setTranslationDomain($domain)
     {
         $this->translationDomain = $domain;
 
@@ -691,7 +691,7 @@ class Lister
      * Get user defined options.
      * @return array
      */
-    public function getCustomOptions(): array
+    public function getCustomOptions()
     {
         return $this->customOptions;
     }
@@ -701,7 +701,7 @@ class Lister
      * @param array $customOptions
      * @return Lister
      */
-    public function setCustomOptions(array $customOptions): Lister
+    public function setCustomOptions(array $customOptions)
     {
         $this->customOptions = $this->resolveCustomOptions($customOptions);
 
@@ -749,7 +749,7 @@ class Lister
      * @param FormBuilder $filterForm
      * @return Lister
      */
-    public function setFilterFormBuilder(FormBuilder $filterForm): Lister
+    public function setFilterFormBuilder(FormBuilder $filterForm)
     {
         $this->filterForm = $filterForm;
 
@@ -760,7 +760,7 @@ class Lister
      * Builds filter form to manipulate list.
      * @return bool True on successful build, false on fail
      */
-    protected function buildFilterForm(): bool
+    protected function buildFilterForm()
     {
         $formBuilder = $this->filterForm;
         if ($formBuilder instanceof FormBuilder && $this->filters->count() > 0) {
@@ -854,7 +854,7 @@ class Lister
      * @return Form|null
      * @throws ListerException
      */
-    public function getSorterForm($sorter): Form
+    public function getSorterForm($sorter)
     {
         if ($this->sorterFormBuilder instanceof FormBuilder) {
             $data = $sorter instanceof Sorter ? $sorter : $this->sorters->get($sorter);
@@ -873,7 +873,7 @@ class Lister
      * @param FormBuilder $builder
      * @return Lister
      */
-    public function setSorterFormBuilder(FormBuilder $builder): Lister
+    public function setSorterFormBuilder(FormBuilder $builder)
     {
         $this->sorterFormBuilder = $builder;
 
@@ -885,7 +885,7 @@ class Lister
      * @param Sorter $sorter
      * @return Form
      */
-    protected function buildSorterForm(Sorter $sorter): Form
+    protected function buildSorterForm(Sorter $sorter)
     {
         $formBuilder = clone $this->sorterFormBuilder;
         $formBuilder->add(
@@ -927,7 +927,7 @@ class Lister
      * @param Router $router
      * @return Lister
      */
-    public function setRouter(Router $router): Lister
+    public function setRouter(Router $router)
     {
         $this->router = $router;
 
@@ -939,7 +939,7 @@ class Lister
      * @param Request $request
      * @return bool True on handled request, false on failure
      */
-    public function handleRequest(Request $request): bool
+    public function handleRequest(Request $request)
     {
         $handled = $clearFilters = false;
         if ($this->filterForm instanceof Form) {
@@ -1006,7 +1006,7 @@ class Lister
      * @return Lister
      * @throws ListerException
      */
-    public function apply(Request $request): Lister
+    public function apply(Request $request)
     {
         $this->customOptions = $this->resolveCustomOptions($this->customOptions);
 
@@ -1064,7 +1064,7 @@ class Lister
      * @param mixed $data
      * @return Element[]
      */
-    public function getHydratedElements($data = null): array
+    public function getHydratedElements($data = null)
     {
         $hydrated = [];
         if ($data === null) {
@@ -1086,7 +1086,7 @@ class Lister
      * @param mixed $data
      * @return Element
      */
-    protected function prepareElement(Element $element, $data): Element
+    protected function prepareElement(Element $element, $data)
     {
         $detached = clone $element;
         $detached->setData($data);
@@ -1098,7 +1098,7 @@ class Lister
      * Get array representation of object.
      * @return array
      */
-    public function serialize(): array
+    public function serialize()
     {
         return [
             'id' => $this->id,

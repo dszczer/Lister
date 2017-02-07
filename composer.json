@@ -16,11 +16,20 @@
     "symfony/symfony": "^2.8|^3.0"
   },
   "require-dev": {
-    "phpdocumentor/phpdocumentor": "2.*"
+    "phpdocumentor/phpdocumentor": "2.*",
+    "phpunit/phpunit": "^5.5"
   },
   "autoload": {
     "psr-4": {
       "": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "": "tests/"
+    },
+    "psr-0": {
+      "": "tests/Propel"
     }
   }
 }

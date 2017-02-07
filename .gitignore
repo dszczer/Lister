@@ -3,3 +3,7 @@
 
 # Composer
 vendor/
+
+# Propel runtime config
+/tests/Propel
+/tests/test.sq3
