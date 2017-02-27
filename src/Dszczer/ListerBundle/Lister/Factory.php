@@ -33,8 +33,8 @@ class Factory
     /**
      * Factory constructor.
      * @param FormFactory $formFactory
-     * @param Router      $router
-     * @param array       $config
+     * @param Router $router
+     * @param array $config
      */
     public function __construct(FormFactory $formFactory, Router $router, array $config)
     {

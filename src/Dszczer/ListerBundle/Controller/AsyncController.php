@@ -46,36 +46,42 @@ class AsyncController extends Controller
                 }
             }
 
-            $response = new JsonResponse([
-                'id' => $list->getId(),
-                'result' => $result,
-                'resultCount' => count($result),
-                'firstPage' => 1,
-                'lastPage' => $pager->getLastPage(),
-                'currentPage' => $pager->getPage(),
-                'listHTML' => $this->callTwigFunction('lister_body', [$list]),
-                'filterHTML' => $this->callTwigFunction('lister_filters', [$list]),
-                'paginationHTML' => $this->callTwigFunction('lister_pagination', [$list]),
-                'status' => [
-                    'type' => 'OK',
-                    'message' => '',
-                ],
-            ]);
+            $response = new JsonResponse(
+                [
+                    'id' => $list->getId(),
+                    'result' => $result,
+                    'resultCount' => count($result),
+                    'firstPage' => 1,
+                    'lastPage' => $pager->getLastPage(),
+                    'currentPage' => $pager->getPage(),
+                    'listHTML' => $this->callTwigFunction('lister_body', [$list]),
+                    'filterHTML' => $this->callTwigFunction('lister_filters', [$list]),
+                    'paginationHTML' => $this->callTwigFunction('lister_pagination', [$list]),
+                    'status' => [
+                        'type' => 'OK',
+                        'message' => '',
+                    ],
+                ]
+            );
         } catch (\Throwable $throwable) {
-            $response = new JsonResponse([
-                'id' => $uuid,
-                'status' => [
-                    'type' => 'ERROR',
-                    'message' => $throwable->getMessage(),
-                ],
-            ], 500);
+            $response = new JsonResponse(
+                [
+                    'id' => $uuid,
+                    'status' => [
+                        'type' => 'ERROR',
+                        'message' => $throwable->getMessage(),
+                    ],
+                ], 500
+            );
         } finally {
-            $response->setCache([
-                'max_age' => 0,
-                's_maxage' => 0,
-                'public' => false,
-                'private' => true
-            ]);
+            $response->setCache(
+                [
+                    'max_age' => 0,
+                    's_maxage' => 0,
+                    'public' => false,
+                    'private' => true,
+                ]
+            );
 
             return $response;
         }
@@ -95,7 +101,7 @@ class AsyncController extends Controller
         $function = $env->getFunction($name);
 
         if (!$function) {
-            throw new \Twig_Error_Runtime("Function $name does not exist in Twig");
+            throw new \Twig_Error_Runtime(sprintf('Function "%s" does not exist in Twig', $name));
         }
         if ($function->needsContext()) {
             array_unshift($argv, null);

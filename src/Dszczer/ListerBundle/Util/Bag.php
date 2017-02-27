@@ -45,7 +45,7 @@ class Bag implements \IteratorAggregate, \Countable
 
     /**
      * Returns the array keys.
-     * @return mixed[] An array of array keys
+     * @return string[] An array of array keys
      */
     public function keys()
     {
@@ -149,7 +149,7 @@ class Bag implements \IteratorAggregate, \Countable
     public function setInstanceValidator($instanceValidator)
     {
         $this->instanceValidator = $instanceValidator;
-        if($this->count() > 0) {
+        if ($this->count() > 0) {
             $this->validateInstance($this->array);
         }
     }
@@ -165,7 +165,7 @@ class Bag implements \IteratorAggregate, \Countable
         if ($this->instanceValidator && class_exists($this->instanceValidator)) {
             if (is_array($data)) {
                 foreach ($data as $key => $item) {
-                    if(!is_object($data)) {
+                    if (!is_object($data)) {
                         throw new \InvalidArgumentException("Data is not an object");
                     } elseif (!$item instanceof $this->instanceValidator) {
                         throw new \InvalidArgumentException(
@@ -178,7 +178,7 @@ class Bag implements \IteratorAggregate, \Countable
                         );
                     }
                 }
-            } elseif(!is_object($data)) {
+            } elseif (!is_object($data)) {
                 throw new \InvalidArgumentException("Data is not an object");
             } elseif (!$data instanceof $this->instanceValidator) {
                 throw new \InvalidArgumentException(

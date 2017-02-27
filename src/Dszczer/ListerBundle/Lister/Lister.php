@@ -94,7 +94,7 @@ class Lister
                 throw new \InvalidArgumentException('Class is not an instance of ModelCriteria');
             }
             unset($query);
-            $this->query = call_user_func($modelClass . '::create');
+            $this->query = call_user_func($modelClass.'::create');
         }
         $this->filters = new FilterBag();
         $this->sorters = new SorterBag();
@@ -296,7 +296,7 @@ class Lister
      */
     public function getPageRequestParameterName()
     {
-        return 'p_' . $this->getId();
+        return 'p_'.$this->getId();
     }
 
     /**
@@ -337,8 +337,7 @@ class Lister
         $elementMethod = '',
         $elementCallable = null,
         $elementData = null
-    )
-    {
+    ) {
         $this->addElement(new Element($name, $label, $elementMethod, $elementCallable, $elementData));
         if ($sort) {
             $this->addSorter(new Sorter($name, $label, $sorterMethod, $sorterValue));
@@ -352,7 +351,7 @@ class Lister
 
     /**
      * Get array of filters.
-     * @return Filter[]
+     * @return Filter[]|\mixed[]
      */
     public function getFilters()
     {
@@ -428,7 +427,7 @@ class Lister
 
     /**
      * Get array of sorters.
-     * @return Sorter[]
+     * @return Sorter[]|\mixed[]
      */
     public function getSorters()
     {
@@ -504,7 +503,7 @@ class Lister
 
     /**
      * Get array of elements.
-     * @return Element[]
+     * @return Element[]|\mixed[]
      */
     public function getElements()
     {
@@ -718,11 +717,16 @@ class Lister
     {
         $resolver = new OptionsResolver();
         $resolver
-            ->setDefaults([
-                'maxLinks' => 7,
-                'route' => 'lister_quick_reload',
-                'params' => ['uuid' => $this->id]
-            ])
+            ->setDefaults(
+                array_replace_recursive(
+                    $options,
+                    [
+                        'maxLinks' => 7,
+                        'route' => 'lister_quick_reload',
+                        'params' => ['uuid' => $this->id],
+                    ]
+                )
+            )
             ->setRequired(['maxLinks', 'route', 'params'])
             ->setAllowedTypes('maxLinks', 'int')
             ->setAllowedTypes('route', 'string')
@@ -859,7 +863,7 @@ class Lister
         if ($this->sorterFormBuilder instanceof FormBuilder) {
             $data = $sorter instanceof Sorter ? $sorter : $this->sorters->get($sorter);
             if (!$data instanceof Sorter) {
-                throw new ListerException('Cannot build sorter form because ' . $sorter . ' does not exist.');
+                throw new ListerException(sprintf('Cannot build sorter form because "%s" does not exist.', $sorter));
             }
 
             return $this->buildSorterForm($data);
@@ -1133,14 +1137,14 @@ class Lister
         if (isset($data['id']) && is_string($data['id'])) {
             $this->id = $data['id'];
         } else {
-            throw new \InvalidArgumentException('This is not Lister serialized string');
+            throw new \InvalidArgumentException('This is not Lister serialized string. ID does not match.');
         }
         if (isset($data['query']) && is_string($data['query'])) {
             $objectOrNull = Helper::decodeAnything($data['query']);
             if ($objectOrNull instanceof ModelCriteria || $objectOrNull === null) {
                 $this->query = $objectOrNull;
             } else {
-                throw new \InvalidArgumentException('This is not Lister serialized string');
+                throw new \InvalidArgumentException('This is not Lister serialized string. Query object is not valid.');
             }
         }
         if (isset($data['externalQuery']) && is_string($data['externalQuery'])) {
@@ -1148,7 +1152,9 @@ class Lister
             if ($objectOrNull instanceof ModelCriteria || $objectOrNull === null) {
                 $this->externalQuery = $objectOrNull;
             } else {
-                throw new \InvalidArgumentException('This is not Lister serialized string');
+                throw new \InvalidArgumentException(
+                    'This is not Lister serialized string. External query object is not valid.'
+                );
             }
         }
         if (isset($data['filters']) && is_string($data['filters'])) {
@@ -1156,7 +1162,7 @@ class Lister
             if ($objectOrNull instanceof FilterBag || $objectOrNull === null) {
                 $this->filters = $objectOrNull;
             } else {
-                throw new \InvalidArgumentException('This is not Lister serialized string');
+                throw new \InvalidArgumentException('This is not Lister serialized string. Filter bag is not valid.');
             }
         }
         if (isset($data['sorters']) && is_string($data['sorters'])) {
@@ -1164,7 +1170,7 @@ class Lister
             if ($objectOrNull instanceof SorterBag || $objectOrNull === null) {
                 $this->sorters = $objectOrNull;
             } else {
-                throw new \InvalidArgumentException('This is not Lister serialized string');
+                throw new \InvalidArgumentException('This is not Lister serialized string. Sorter bag is not valid.');
             }
         }
         if (isset($data['elements']) && is_string($data['elements'])) {
@@ -1172,58 +1178,78 @@ class Lister
             if ($objectOrNull instanceof ElementBag || $objectOrNull === null) {
                 $this->elements = $objectOrNull;
             } else {
-                throw new \InvalidArgumentException('This is not Lister serialized string');
+                throw new \InvalidArgumentException('This is not Lister serialized string. Element bag is not valid.');
             }
         }
         if (isset($data['perpage']) && is_int($data['perpage'])) {
             $this->perpage = $data['perpage'];
         } else {
-            throw new \InvalidArgumentException('This is not Lister serialized string');
+            throw new \InvalidArgumentException(
+                'This is not Lister serialized string. Missing or invalid "perpage" property.'
+            );
         }
         if (isset($data['currentPage']) && is_int($data['currentPage'])) {
             $this->currentPage = $data['currentPage'];
         } else {
-            throw new \InvalidArgumentException('This is not Lister serialized string');
+            throw new \InvalidArgumentException(
+                'This is not Lister serialized string. Missing or invalid "currentPage" property.'
+            );
         }
         if (isset($data['persist']) && is_bool($data['persist'])) {
             $this->persist = $data['persist'];
         } else {
-            throw new \InvalidArgumentException('This is not Lister serialized string');
+            throw new \InvalidArgumentException(
+                'This is not Lister serialized string. Missing or invalid "persist" property.'
+            );
         }
         if (isset($data['dynamic']) && is_bool($data['dynamic'])) {
             $this->dynamic = $data['dynamic'];
         } else {
-            throw new \InvalidArgumentException('This is not Lister serialized string');
+            throw new \InvalidArgumentException(
+                'This is not Lister serialized string. Missing or invalid "dynamic" property.'
+            );
         }
         if (isset($data['filterLayout']) && is_string($data['filterLayout'])) {
             $this->filterLayout = $data['filterLayout'];
         } else {
-            throw new \InvalidArgumentException('This is not Lister serialized string');
+            throw new \InvalidArgumentException(
+                'This is not Lister serialized string. Missing or invalid "filterLayout" property.'
+            );
         }
         if (isset($data['listLayout']) && is_string($data['listLayout'])) {
             $this->listLayout = $data['listLayout'];
         } else {
-            throw new \InvalidArgumentException('This is not Lister serialized string');
+            throw new \InvalidArgumentException(
+                'This is not Lister serialized string. Missing or invalid "listLayout" property.'
+            );
         }
         if (isset($data['elementLayout']) && is_string($data['elementLayout'])) {
             $this->elementLayout = $data['elementLayout'];
         } else {
-            throw new \InvalidArgumentException('This is not Lister serialized string');
+            throw new \InvalidArgumentException(
+                'This is not Lister serialized string. Missing or invalid "elementLayout" property.'
+            );
         }
         if (isset($data['paginationLayout']) && is_string($data['paginationLayout'])) {
             $this->paginationLayout = $data['paginationLayout'];
         } else {
-            throw new \InvalidArgumentException('This is not Lister serialized string');
+            throw new \InvalidArgumentException(
+                'This is not Lister serialized string. Missing or invalid "paginationLayout" property.'
+            );
         }
         if (isset($data['translationDomain']) && is_string($data['translationDomain'])) {
             $this->translationDomain = $data['translationDomain'];
         } else {
-            throw new \InvalidArgumentException('This is not Lister serialized string');
+            throw new \InvalidArgumentException(
+                'This is not Lister serialized string. Missing or invalid "translationDomain" property.'
+            );
         }
         if (isset($data['customOptions']) && is_array($data['customOptions'])) {
             $this->customOptions = $data['customOptions'];
         } else {
-            throw new \InvalidArgumentException('This is not Lister serialized string');
+            throw new \InvalidArgumentException(
+                'This is not Lister serialized string. Missing or invalid "customOptions" property.'
+            );
         }
         $this->rebuildQuery = true;
     }

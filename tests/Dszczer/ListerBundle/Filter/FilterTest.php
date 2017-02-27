@@ -160,7 +160,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(BasicCriterion::class, $crit);
     }
 
-    private function getNewLister()
+    public function getNewLister()
     {
         $lister = new Lister('', '');
         return $lister->setQuery(AuthorQuery::create());

@@ -79,10 +79,13 @@ class ListerExtension extends \Twig_Extension
      */
     public function listerPaginationFunction(\Twig_Environment $env, Lister $list)
     {
-        return $env->render($list->getPaginationLayout(), [
-            'list' => $list,
-            'pagination' => $list->getPager(),
-        ]);
+        return $env->render(
+            $list->getPaginationLayout(),
+            [
+                'list' => $list,
+                'pagination' => $list->getPager(),
+            ]
+        );
     }
 
     /**

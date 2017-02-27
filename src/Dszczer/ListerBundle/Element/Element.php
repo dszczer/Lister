@@ -78,7 +78,11 @@ class Element
                 try {
                     return $this->data->{$this->elementMethod}();
                 } catch (\Throwable $throwable) {
-                    throw new ElementException("Error while calling method ".$this->elementMethod, 0, $throwable);
+                    throw new ElementException(
+                        sprintf('Error while calling method "%s"', $this->elementMethod),
+                        0,
+                        $throwable
+                    );
                 }
             }
         }

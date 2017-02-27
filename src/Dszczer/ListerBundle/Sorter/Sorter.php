@@ -24,7 +24,7 @@ class Sorter
     protected $label;
     /** @var mixed One of: null, 'asc', 'desc' */
     protected $value;
-    /** @var string Method to call*/
+    /** @var string Method to call */
     protected $sorterMethod;
     /** @var bool Flag to determine if method is set or not */
     protected $default = true;

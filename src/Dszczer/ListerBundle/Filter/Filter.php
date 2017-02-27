@@ -59,8 +59,7 @@ class Filter
         $method = '',
         $value = null,
         array $values = []
-    )
-    {
+    ) {
         $this->type = $type;
         $this->name = $name;
         $this->label = $label;
@@ -125,8 +124,18 @@ class Filter
      */
     private function checkType()
     {
-        if (!in_array($this->type, [static::TYPE_TEXT, static::TYPE_CHECKBOX, static::TYPE_MULTISELECT, static::TYPE_RADIO, static::TYPE_SELECT])) {
-            throw new FilterException("Invalid filter type {$this->type}");
+        if (!in_array(
+            $this->type,
+            [
+                static::TYPE_TEXT,
+                static::TYPE_CHECKBOX,
+                static::TYPE_MULTISELECT,
+                static::TYPE_RADIO,
+                static::TYPE_SELECT,
+            ]
+        )
+        ) {
+            throw new FilterException(sprintf('Invalid filter type "%s"', $this->type));
         }
     }
 
@@ -261,7 +270,9 @@ class Filter
         $query = $lister->getQuery(false);
         if ($query instanceof ModelCriteria) {
             if (!method_exists($query, $this->filterMethod)) {
-                throw new FilterException('Method "' . $this->filterMethod . '" of assigned query object is not defined');
+                throw new FilterException(
+                    sprintf('Method "%s" of assigned query object is not defined', $this->filterMethod)
+                );
             }
 
             return $this->rawApply(
