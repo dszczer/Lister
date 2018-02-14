@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdoc>
+    <title>Dszczer Lister</title>
+    <files>
+        <directory>./src</directory>
+    </files>
+    <parser>
+        <target>./docs</target>
+    </parser>
+    <transformer>
+        <target>./docs</target>
+    </transformer>
+    <transformations>
+        <template name="responsive-twig" />
+    </transformations>
+    <logging>
+        <level>quiet</level>
+    </logging>
+</phpdoc>

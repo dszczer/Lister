@@ -8,7 +8,6 @@
 
 // global namespace
 namespace {
-
     /** @const bool OS type, change to false if testing on other platform than Windows */
     define('IS_WINDOWS', true);
     if (IS_WINDOWS) {
@@ -18,7 +17,7 @@ namespace {
     }
 
     // autoloader
-    require_once \realpath(ROOTDIR.'/../vendor/autoload.php');
+    require_once \realpath(ROOTDIR . '/../vendor/autoload.php');
 }
 
 //Use different namespace to don't clutter global namespace
@@ -28,20 +27,74 @@ namespace Dszczer\ListerBundle\TestInventory {
     use Dszczer\ListerBundle\AuthorQuery;
     use Dszczer\ListerBundle\Book;
     use Dszczer\ListerBundle\BookQuery;
+    use Propel\Runtime\Connection\ConnectionInterface;
     use Propel\Runtime\Propel;
+
+    /**
+     * @param array|string[] $strs
+     * @return string
+     */
+    function testGetRandomStr(array $strs): string
+    {
+        return $strs[array_rand($strs)];
+    }
+
+    /**
+     * @param int $amount
+     * @param ConnectionInterface $conn
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    function createAuthors(int $amount, ConnectionInterface $conn)
+    {
+        $firstNames = ['Ageia', 'Foo', 'Bar', 'Moren', 'Bastet', 'Trevor', 'Camille', 'Gregory', 'John',
+            'Emilly', 'Alex'];
+        $lastNames = ['Era', 'Idea', 'Watermark', 'Bloom', 'Powerplant', 'Wonder', 'Barcode', 'Quzill', 'Domestic',
+            'Smith', 'Bag'];
+
+        for ($i = 1; $i <= $amount; $i++) {
+            $a = new Author();
+            $a->setFirstName(testGetRandomStr($firstNames))
+                ->setLastName(testGetRandomStr($lastNames))
+                ->setEmail("example.mail.$i@example.com")
+                ->save($conn);
+        }
+    }
+
+    /**
+     * @param int $amount
+     * @param ConnectionInterface $conn
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    function createBooks(int $amount, ConnectionInterface $conn)
+    {
+        $words = ['potato', 'umbrella', 'case', 'car', 'group', 'fast', 'local', 'own', 'pollution', 'smart',
+            'hook', 'Earth'];
+
+        for ($bi = 1; $bi <= $amount; $bi++) {
+            $a = AuthorQuery::getRandom();
+            $b = new Book();
+            $b->setAuthor($a)
+                ->setTitle(
+                    testGetRandomStr($words) . ' ' . testGetRandomStr($words) . ' ' . testGetRandomStr($words)
+                    . ' ' . testGetRandomStr($words)
+                )
+                ->setIsbn(mt_rand(19384, 294957))
+                ->save($conn);
+        }
+    }
 
     /**
      * Database fixture
      */
     $cmdBinDir = sprintf(
         'cd "%s" && %s',
-        escapeshellarg(ROOTDIR.'/../vendor/bin'),
-        escapeshellcmd('propel'.(IS_WINDOWS ? '.bat' : ''))
+        escapeshellarg(ROOTDIR . '/../vendor/bin'),
+        escapeshellcmd('propel' . (IS_WINDOWS ? '.bat' : ''))
     );
-    $cmdConfigDir = '--config-dir="'.escapeshellarg(ROOTDIR).'"';
+    $cmdConfigDir = '--config-dir="' . escapeshellarg(ROOTDIR) . '"';
     exec(sprintf('%s config:convert %s', $cmdBinDir, $cmdConfigDir));
     // init connection
-    Propel::init(ROOTDIR.'/Propel/Runtime/config.php');
+    Propel::init(ROOTDIR . '/Propel/Runtime/config.php');
     $conn = Propel::getConnection();
     // build classes
     exec(sprintf('%s model:build %s', $cmdBinDir, $cmdConfigDir));
@@ -49,36 +102,15 @@ namespace Dszczer\ListerBundle\TestInventory {
     exec(sprintf('%s migration:diff %s', $cmdBinDir, $cmdConfigDir));
     exec(sprintf('%s migration:migrate %s', $cmdBinDir, $cmdConfigDir));
     // cleanup after migration
-    foreach (glob(ROOTDIR.'/Propel/Migration/*') as $mfile) {
+    foreach (glob(ROOTDIR . '/Propel/Migration/*') as $mfile) {
         unlink($mfile);
     }
 
-    // some "random" first and last names pool
-    $firstNames = ['Ageia', 'Foo', 'Bar', 'Moren', 'Bastet', 'Trevor', 'Camille', 'Gregory', 'John', 'Emilly', 'Alex'];
-    $lastNames = ['Era', 'Idea', 'Watermark', 'Bloom', 'Powerplant', 'Wonder', 'Barcode', 'Quzill', 'Domestic', 'Smith', 'Bag'];
-    $words = ['potato', 'umbrella', 'case', 'car', 'group', 'fast', 'local', 'own', 'pollution', 'smart', 'hook', 'Earth'];
-    function testGetRandomStr(array $strs)
-    {
-        return $strs[array_rand($strs)];
-    }
-
     // insert test data only if database is empty
-    if(AuthorQuery::create()->count($conn) == 0 && BookQuery::create()->count($conn) == 0) {
-        for ($i = 1; $i <= 50; $i++) {
-            $a = new Author();
-            $a->setFirstName(testGetRandomStr($firstNames))
-                ->setLastName(testGetRandomStr($lastNames))
-                ->setEmail("example.mail.$i@example.com")
-                ->save($conn);
-            for ($bi = 1; $bi <= mt_rand(1, 4); $bi++) {
-                $b = new Book();
-                $b->setAuthor($a)
-                    ->setTitle(
-                        testGetRandomStr($words).' '.testGetRandomStr($words).' '.testGetRandomStr($words).' '.testGetRandomStr($words)
-                    )
-                    ->setIsbn(mt_rand(19384, 294957))
-                    ->save($conn);
-            }
-        }
+    if (AuthorQuery::create()->count($conn) == 0) {
+        createAuthors(50, $conn);
+    }
+    if (BookQuery::create()->count($conn) == 0) {
+        createBooks(100, $conn);
     }
 }

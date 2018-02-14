@@ -1,0 +1,2 @@
+app:
+  resource: '@DszczerListerBundle/Resources/config/routing.yml'

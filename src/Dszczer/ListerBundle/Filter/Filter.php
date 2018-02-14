@@ -1,12 +1,13 @@
 <?php
 /**
  * Filter class representation.
- * @category     Filter
- * @author       Damian Szczerbiński <dszczer@gmail.com>
+ * @category Filter
+ * @author   Damian Szczerbiński <dszczer@gmail.com>
  */
 
 namespace Dszczer\ListerBundle\Filter;
 
+use Doctrine\ORM\EntityRepository;
 use Dszczer\ListerBundle\Lister\Lister;
 use Dszczer\ListerBundle\Util\Helper;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -18,6 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 /**
  * Class Filter
  * @package Dszczer\ListerBundle
+ * @since 0.9
  */
 class Filter
 {
@@ -29,16 +31,22 @@ class Filter
 
     /** @var string Type of filter input */
     protected $type;
+
     /** @var string Name of Filter object */
     protected $name;
+
     /** @var string Label to display */
     protected $label;
+
     /** @var mixed Filter's value */
     protected $value;
+
     /** @var mixed[] Enum values to use selectable list/check, instead of free input */
     protected $values = [];
+
     /** @var string Method to call when applying filter */
     protected $filterMethod;
+
     /** @var bool Flag to mark if $filterMethod was set or not */
     protected $default = true;
 
@@ -53,27 +61,24 @@ class Filter
      * @throws FilterException
      */
     public function __construct(
-        $type,
-        $name = '',
-        $label = '',
-        $method = '',
+        string $type,
+        string $name = '',
+        string $label = '',
+        string $method = '',
         $value = null,
         array $values = []
-    ) {
+    )
+    {
         $this->type = $type;
         $this->name = $name;
         $this->label = $label;
+        $this->filterMethod = $method;
         $this->value = $value;
         $this->values = $values;
 
         $this->checkType();
 
-        if (empty($method) && !empty($name)) {
-            $this->filterMethod = Helper::camelize("filter_by_$name");
-        } else {
-            $this->filterMethod = $method;
-            $this->default = false;
-        }
+        $this->default = empty($method) && !empty($name);
     }
 
     /**
@@ -81,7 +86,7 @@ class Filter
      * @param bool $className true for Symfony Type's full class name or false for constant string one
      * @return string
      */
-    public function getType($className = true)
+    public function getType(bool $className = true): string
     {
         if ($className) {
             // cannot use switch syntax because of condition order
@@ -110,7 +115,7 @@ class Filter
      * @return Filter
      * @throws FilterException
      */
-    public function setType($type)
+    public function setType(string $type): Filter
     {
         $this->type = $type;
         $this->checkType();
@@ -143,7 +148,7 @@ class Filter
      * Get name of $this Filter.
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -153,7 +158,7 @@ class Filter
      * @param string $name
      * @return Filter
      */
-    public function setName($name)
+    public function setName(string $name): Filter
     {
         $this->name = $name;
 
@@ -164,7 +169,7 @@ class Filter
      * Get label of filter's form field.
      * @return string
      */
-    public function getLabel()
+    public function getLabel(): string
     {
         return $this->label;
     }
@@ -174,7 +179,7 @@ class Filter
      * @param string $label
      * @return Filter
      */
-    public function setLabel($label)
+    public function setLabel(string $label): Filter
     {
         $this->label = $label;
 
@@ -195,7 +200,7 @@ class Filter
      * @param mixed $value
      * @return Filter
      */
-    public function setValue($value)
+    public function setValue($value): Filter
     {
         $this->value = $value;
 
@@ -206,7 +211,7 @@ class Filter
      * Get enum values to use as filter value.
      * @return array
      */
-    public function getValues()
+    public function getValues(): array
     {
         return $this->values;
     }
@@ -216,7 +221,7 @@ class Filter
      * @param array $values
      * @return Filter
      */
-    public function setValues(array $values)
+    public function setValues(array $values): Filter
     {
         $this->values = $values;
 
@@ -227,7 +232,7 @@ class Filter
      * Get filter method name to call when applying filter.
      * @return string
      */
-    public function getFilterMethod()
+    public function getFilterMethod(): string
     {
         return $this->filterMethod;
     }
@@ -237,7 +242,7 @@ class Filter
      * @param string $filterMethod
      * @return Filter
      */
-    public function setFilterMethod($filterMethod)
+    public function setFilterMethod(string $filterMethod): Filter
     {
         $this->default = false;
         $this->filterMethod = $filterMethod;
@@ -249,13 +254,13 @@ class Filter
      * Check if method name is set or not.
      * @return bool True for default generated Model method stub, false for defined one.
      */
-    public function isDefaultMethod()
+    public function isDefaultMethod(): bool
     {
         return $this->default;
     }
 
     /**
-     * Apply filter value by calling defined method on injected $lister object.
+     * Apply filter value by calling defined method on query object.
      * @param Lister $lister List to apply filter on
      * @param array $extraArguments Additional parameters passed to called method
      * @return mixed Value returned by called method
@@ -268,30 +273,63 @@ class Filter
         }
 
         $query = $lister->getQuery(false);
-        if ($query instanceof ModelCriteria) {
-            if (!method_exists($query, $this->filterMethod)) {
-                throw new FilterException(
-                    sprintf('Method "%s" of assigned query object is not defined', $this->filterMethod)
-                );
-            }
-
-            return $this->rawApply(
-                $query,
-                array_merge([$this->value], $extraArguments)
-            );
-        } else {
+        if (!is_object($query)) {
             throw new FilterException('Lister is not ready to apply filter - missing assigned query object');
         }
-    }
 
-    /**
-     * Call method on object.
-     * @param ModelCriteria $query
-     * @param array $args
-     * @return mixed
-     */
-    protected function rawApply(ModelCriteria $query, array $args)
-    {
-        return $this->getValue() !== null ? call_user_func_array([$query, $this->filterMethod], $args) : $query;
+        if ($this->value !== null) {
+            if ($this->default) {
+                $this->filterMethod = Helper::camelize("filter_by_{$this->name}");
+                if ($query instanceof ModelCriteria) {
+                    if(!method_exists($query, $this->filterMethod)) {
+                        throw new FilterException(
+                            sprintf('Method "%s" of assigned query object is not defined', $this->filterMethod)
+                        );
+                    }
+                    return call_user_func_array(
+                        [$query, $this->filterMethod],
+                        array_merge([$this->value], $extraArguments)
+                    );
+                } else {
+                    $repository = $lister->getRepository();
+                    if ($repository instanceof EntityRepository && method_exists($repository, $this->filterMethod)) {
+                        return call_user_func_array(
+                            [$repository, $this->filterMethod],
+                            array_merge([$query, $this->value], $extraArguments)
+                        );
+                    } else {
+                        $this->filterMethod = $this->name;
+                    }
+                }
+            }
+
+            if ($query instanceof ModelCriteria) {
+                return call_user_func_array([$query, $this->filterMethod], array_merge([$this->value], $extraArguments));
+            } else {
+                $aliases = $query->getRootAliases();
+                $alias = array_shift($aliases);
+                if(!empty($extraArguments[0]) && $extraArguments[0] === 'LIKE') {
+                    $isLike = true;
+                    array_shift($extraArguments);
+                } else {
+                    $isLike = false;
+                }
+                if ($this->type === self::TYPE_TEXT && $isLike) {
+                    array_unshift(
+                        $extraArguments,
+                        $query->expr()->like(
+                            $alias . '.' . $this->filterMethod,
+                            $query->expr()->literal($this->value)
+                        )
+                    );
+                } else {
+                    array_unshift($extraArguments, $query->expr()->eq($alias . '.' . $this->filterMethod, $this->value));
+                }
+
+                return call_user_func_array([$query, 'andWhere'], $extraArguments);
+            }
+        } else {
+            return $query;
+        }
     }
 }

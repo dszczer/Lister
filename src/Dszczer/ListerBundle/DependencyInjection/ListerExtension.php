@@ -1,9 +1,10 @@
 <?php
 /**
  * Bundle configuration.
- * @category     Bundle configuration
- * @author       Damian Szczerbiński <dszczer@gmail.com>
+ * @category Bundle configuration
+ * @author   Damian Szczerbiński <dszczer@gmail.com>
  */
+
 namespace Dszczer\ListerBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
@@ -14,6 +15,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 /**
  * Class ListerExtension
  * @package Dszczer\ListerBundle
+ * @since 0.9
  */
 class ListerExtension extends Extension
 {
@@ -22,6 +24,7 @@ class ListerExtension extends Extension
      * @param array $configs An array of configuration values
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @throws \InvalidArgumentException When provided tag is not defined in this extension
+     * @throws \Exception
      */
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -31,7 +34,7 @@ class ListerExtension extends Extension
         $container->setParameter('lister_config', $processedConfig);
 
         // load services
-        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
     }
 }

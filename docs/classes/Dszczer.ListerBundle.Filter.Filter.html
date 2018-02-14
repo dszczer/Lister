@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta charset="utf-8"/>
-    <title>    API Documentation &raquo; \Dszczer\ListerBundle\Filter\Filter
+    <title>    Dszczer Lister &raquo; \Dszczer\ListerBundle\Filter\Filter
 </title>
     <meta name="author" content=""/>
     <meta name="description" content=""/>
@@ -33,7 +33,7 @@
                 <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                     <span class="icon-bar"></span> <span class="icon-bar"></span>
                     <span class="icon-bar"></span> </a>
-                <a class="brand" href="../index.html">API Documentation</a>
+                <a class="brand" href="../index.html">Dszczer Lister</a>
 
                 <div class="nav-collapse">
                     <ul class="nav">
@@ -126,8 +126,8 @@
     </li>
 
                                                                                                         <li class="method public">
-        <a href="#method_apply" title="apply :: Apply filter value by calling defined method on injected $lister object.">
-            <span class="description">Apply filter value by calling defined method on injected $lister object.</span><pre>apply</pre>
+        <a href="#method_apply" title="apply :: Apply filter value by calling defined method on query object.">
+            <span class="description">Apply filter value by calling defined method on query object.</span><pre>apply</pre>
         </a>
     </li>
 
@@ -173,7 +173,7 @@
         </a>
     </li>
 
-                                                                                                                                                                <li class="method public">
+                                                                                                        <li class="method public">
         <a href="#method_setFilterMethod" title="setFilterMethod :: Set filter method name to call when applying filter.">
             <span class="description">Set filter method name to call when applying filter.</span><pre>setFilterMethod</pre>
         </a>
@@ -213,12 +213,7 @@
         </li>
         <li class="nav-header protected">» Protected
             <ul>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                    <li class="method protected">
-                            <a href="#method_rawApply" title="rawApply :: Call method on object.">
-                                <span class="description">Call method on object.</span><pre>rawApply</pre>
-                            </a>
-                        </li>
-                                                                                                                                                                                                                                                                        </ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </ul>
         </li>
         <li class="nav-header private">» Private
             <ul>
@@ -227,7 +222,7 @@
                                 <span class="description">Validate set type of Filter.</span><pre>checkType</pre>
                             </a>
                         </li>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </ul>
         </li>
         <li class="nav-header">
             <i class="icon-custom icon-constant"></i> Constants
@@ -282,6 +277,15 @@
                                     <td>
                                                                                     
                                                                                 <p>Dszczer\ListerBundle</p>
+                                    </td>
+                                </tr>
+                                                                                                                <tr>
+                                    <th>
+                                        since
+                                                                            </th>
+                                    <td>
+                                                                                    0.9
+                                                                                
                                     </td>
                                 </tr>
                                                                                                                                                                                 </table>
@@ -350,7 +354,7 @@
                         </div>
                                             <a id="method_apply"></a>
                         <div class="element clickable method public  method_apply" data-toggle="collapse" data-target=".method_apply .collapse">
-                            <h2>Apply filter value by calling defined method on injected $lister object.</h2>
+                            <h2>Apply filter value by calling defined method on query object.</h2>
                             <pre>apply(\Dszczer\ListerBundle\Lister\Lister $lister, array $extraArguments = array()) : mixed</pre>
                             <div class="labels">
                                                                                                                                                                                             </div>
@@ -628,37 +632,6 @@
                                     
                                                                             <h3>Response</h3>
                                         <code>boolean</code><p><p>True for default generated Model method stub, false for defined one.</p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_rawApply"></a>
-                        <div class="element clickable method protected  method_rawApply" data-toggle="collapse" data-target=".method_rawApply .collapse">
-                            <h2>Call method on object.</h2>
-                            <pre>rawApply(\Propel\Runtime\ActiveQuery\ModelCriteria $query, array $args) : mixed</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                                                    </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$query</h4>
-                                                <code>\Propel\Runtime\ActiveQuery\ModelCriteria</code><p></p>
-                                            </div>
-                                                                                    <div class="subelement argument">
-                                                <h4>$args</h4>
-                                                <code>array</code><p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>mixed</code><p></p>
                                                                     </div>
                             </div>
 
@@ -1145,7 +1118,7 @@
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by
             <a href="http://glyphicons.com/">Glyphicons</a>.<br/>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and<br/>
-            generated on Tue, 24 Jan 2017 20:10:24 +0100.<br/>
+            generated on Wed, 14 Feb 2018 22:00:35 +0100.<br/>
     </footer>
     </body>
 </html>

@@ -21,11 +21,13 @@ class HelperTest extends \PHPUnit_Framework_TestCase
         $underscore = "some_underscore_string";
         $malformed = "This-is_malformedString";
         $camelized = "thisShouldNotBeChanged";
+        $partlyCamelized = "this_is_partlyCamelized";
 
         $this->assertEquals("someUnderscoreString", Helper::camelize($underscore));
         $this->assertEquals("thisIs_malformedString", Helper::camelize($malformed, '-'));
         $this->assertEquals("this-isMalformedString", Helper::camelize($malformed));
         $this->assertEquals("thisShouldNotBeChanged", Helper::camelize($camelized));
+        $this->assertEquals("thisIsPartlyCamelized", Helper::camelize($partlyCamelized));
     }
 
     public function testFixTwigTemplatePath()

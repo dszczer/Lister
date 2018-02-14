@@ -1,8 +1,8 @@
 <?php
 /**
  * Various helper functions.
- * @category     Utils
- * @author       Damian Szczerbiński <dszczer@gmail.com>
+ * @category Utils
+ * @author   Damian Szczerbiński <dszczer@gmail.com>
  */
 
 namespace Dszczer\ListerBundle\Util;
@@ -10,6 +10,7 @@ namespace Dszczer\ListerBundle\Util;
 /**
  * Class Helper
  * @package Dszczer\ListerBundle
+ * @since 0.9
  */
 abstract class Helper
 {
@@ -17,7 +18,7 @@ abstract class Helper
      * Generates UUIDv4 unique identifier as string.
      * @return string
      */
-    public static function uuidv4()
+    public static function uuidv4(): string
     {
         return sprintf(
             '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
@@ -51,7 +52,7 @@ abstract class Helper
      * @param string $separator Separator of words
      * @return string
      */
-    public static function camelize($input, $separator = '_')
+    public static function camelize(string $input, string $separator = '_'): string
     {
         return lcfirst(str_replace($separator, '', ucwords(str_replace(' ', $separator, $input), $separator)));
     }
@@ -61,7 +62,7 @@ abstract class Helper
      * @param string $path Symfony-like twig path
      * @return string
      */
-    public static function fixTwigTemplatePath($path)
+    public static function fixTwigTemplatePath(string $path): string
     {
         return str_replace([':', 'Bundle'], ['/', ''], $path);
     }
@@ -73,7 +74,7 @@ abstract class Helper
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    public static function encodeAnything($source)
+    public static function encodeAnything($source): string
     {
         if (is_resource($source)) {
             throw new \InvalidArgumentException('Object is not valid to encode');
@@ -102,7 +103,7 @@ abstract class Helper
      * @throws \Exception
      * @throws \InvalidArgumentException
      */
-    public static function decodeAnything($source)
+    public static function decodeAnything(string $source)
     {
         try {
             $decoded = json_decode($source, true);

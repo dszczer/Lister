@@ -2,8 +2,10 @@
 
 namespace Dszczer\ListerBundle\Filter;
 
+use Doctrine\ORM\QueryBuilder;
 use Dszczer\ListerBundle\AuthorQuery;
 use Dszczer\ListerBundle\Lister\Lister;
+use Dszczer\ListerBundle\ListerTestCase;
 use Dszczer\ListerBundle\Map\AuthorTableMap;
 use Propel\Runtime\ActiveQuery\Criterion\BasicCriterion;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -11,8 +13,15 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-class FilterTest extends \PHPUnit_Framework_TestCase
+/**
+ * Class FilterTest
+ * @package Dszczer\ListerBundle\Filter
+ */
+class FilterTest extends ListerTestCase
 {
+    /**
+     * @throws FilterException
+     */
     public function testConstructorNoArgs()
     {
         $filter = new Filter(Filter::TYPE_TEXT);
@@ -25,19 +34,21 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testConstructorNoArgs
+     * @throws FilterException
      */
     public function testConstructorTypicalUse()
     {
         $filter = new Filter(Filter::TYPE_TEXT, 'myName', 'myLabel');
         $this->assertEquals('myName', $filter->getName());
         $this->assertEquals('myLabel', $filter->getLabel());
-        $this->assertEquals('filterByMyName', $filter->getFilterMethod());
+        $this->assertEquals('', $filter->getFilterMethod());
         $this->assertEquals(null, $filter->getValue());
         $this->assertTrue($filter->isDefaultMethod());
     }
 
     /**
      * @depends testConstructorTypicalUse
+     * @throws FilterException
      */
     public function testGettersAndSetters()
     {
@@ -66,6 +77,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testConstructorTypicalUse
+     * @throws FilterException
      */
     public function testTypeClassName()
     {
@@ -99,6 +111,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testTypeClassName
+     * @throws FilterException
      */
     public function testInvalidType()
     {
@@ -108,6 +121,8 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testTypeClassName
+     * @throws FilterException
+     * @throws \Dszczer\ListerBundle\Lister\ListerException
      */
     public function testMissingValues()
     {
@@ -119,6 +134,8 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testTypeClassName
+     * @throws FilterException
+     * @throws \Dszczer\ListerBundle\Lister\ListerException
      */
     public function testMissingMethod()
     {
@@ -130,6 +147,8 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testTypeClassName
+     * @throws FilterException
+     * @throws \Dszczer\ListerBundle\Lister\ListerException
      */
     public function testListerNotReady()
     {
@@ -141,6 +160,8 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     /**
      * @depends testConstructorTypicalUse
      * @depends testListerNotReady
+     * @throws FilterException
+     * @throws \Dszczer\ListerBundle\Lister\ListerException
      */
     public function testApply()
     {
@@ -160,6 +181,28 @@ class FilterTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(BasicCriterion::class, $crit);
     }
 
+    /**
+     * @depends testConstructorTypicalUse
+     * @depends testListerNotReady
+     * @throws FilterException
+     * @throws \Dszczer\ListerBundle\Lister\ListerException
+     * @throws \Exception
+     */
+    public function testApplyDoctrine()
+    {
+        $filter = new Filter(Filter::TYPE_TEXT, 'firstName', 'myFilter');
+        $filter->setValue('ASC');
+
+        $lister = self::$myKernel->getContainer()
+            ->get('lister.factory')
+            ->createList('DszczerListerBundle:Book');
+        $filter->apply($lister);
+    }
+
+    /**
+     * @return Lister
+     * @throws \Dszczer\ListerBundle\Lister\ListerException
+     */
     public function getNewLister()
     {
         $lister = new Lister('', '');

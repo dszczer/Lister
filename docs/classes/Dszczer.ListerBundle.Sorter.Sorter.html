@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta charset="utf-8"/>
-    <title>    API Documentation &raquo; \Dszczer\ListerBundle\Sorter\Sorter
+    <title>    Dszczer Lister &raquo; \Dszczer\ListerBundle\Sorter\Sorter
 </title>
     <meta name="author" content=""/>
     <meta name="description" content=""/>
@@ -33,7 +33,7 @@
                 <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                     <span class="icon-bar"></span> <span class="icon-bar"></span>
                     <span class="icon-bar"></span> </a>
-                <a class="brand" href="../index.html">API Documentation</a>
+                <a class="brand" href="../index.html">Dszczer Lister</a>
 
                 <div class="nav-collapse">
                     <ul class="nav">
@@ -161,7 +161,7 @@
         </a>
     </li>
 
-                                                                                                                                                                <li class="method public">
+                                                                                                        <li class="method public">
         <a href="#method_setLabel" title="setLabel :: Set sorter label.">
             <span class="description">Set sorter label.</span><pre>setLabel</pre>
         </a>
@@ -189,16 +189,11 @@
         </li>
         <li class="nav-header protected">» Protected
             <ul>
-                                                                                                                                                                                                                                                                                                                                        <li class="method protected">
-                            <a href="#method_rawApply" title="rawApply :: Call method on object.">
-                                <span class="description">Call method on object.</span><pre>rawApply</pre>
-                            </a>
-                        </li>
-                                                                                                                                                                                                </ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        </ul>
         </li>
         <li class="nav-header private">» Private
             <ul>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        </ul>
         </li>
         <li class="nav-header">
             <i class="icon-custom icon-constant"></i> Constants
@@ -228,6 +223,15 @@
                                     <td>
                                                                                     
                                                                                 <p>Dszczer\ListerBundle</p>
+                                    </td>
+                                </tr>
+                                                                                                                <tr>
+                                    <th>
+                                        since
+                                                                            </th>
+                                    <td>
+                                                                                    0.9
+                                                                                
                                     </td>
                                 </tr>
                                                                                                                                                                                 </table>
@@ -407,7 +411,7 @@
                                             <a id="method_getValue"></a>
                         <div class="element clickable method public  method_getValue" data-toggle="collapse" data-target=".method_getValue .collapse">
                             <h2>Get sorting value.</h2>
-                            <pre>getValue() : mixed</pre>
+                            <pre>getValue() : string|null</pre>
                             <div class="labels">
                                                                                                                                                                                             </div>
 
@@ -428,7 +432,7 @@
 
                                     
                                                                             <h3>Response</h3>
-                                        <code>mixed</code><p></p>
+                                        <code>string|null</code><p></p>
                                                                     </div>
                             </div>
 
@@ -458,37 +462,6 @@
                                     
                                                                             <h3>Response</h3>
                                         <code>boolean</code><p><p>True for defined method, false for default generated stub</p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_rawApply"></a>
-                        <div class="element clickable method protected  method_rawApply" data-toggle="collapse" data-target=".method_rawApply .collapse">
-                            <h2>Call method on object.</h2>
-                            <pre>rawApply(\Propel\Runtime\ActiveQuery\ModelCriteria $query, array $args) : mixed</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                                                    </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$query</h4>
-                                                <code>\Propel\Runtime\ActiveQuery\ModelCriteria</code><p></p>
-                                            </div>
-                                                                                    <div class="subelement argument">
-                                                <h4>$args</h4>
-                                                <code>array</code><p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>mixed</code><p></p>
                                                                     </div>
                             </div>
 
@@ -577,7 +550,7 @@
                                             <a id="method_setValue"></a>
                         <div class="element clickable method public  method_setValue" data-toggle="collapse" data-target=".method_setValue .collapse">
                             <h2>Set sorting value.</h2>
-                            <pre>setValue(mixed $value) : \Dszczer\ListerBundle\Sorter\Sorter</pre>
+                            <pre>setValue(string|null $value) : \Dszczer\ListerBundle\Sorter\Sorter</pre>
                             <div class="labels">
                                                                                                                                                                                             </div>
 
@@ -592,7 +565,7 @@
                                                                             <h3>Arguments</h3>
                                                                                     <div class="subelement argument">
                                                 <h4>$value</h4>
-                                                <code>mixed</code><p></p>
+                                                <code>string|null</code><p></p>
                                             </div>
                                                                             
                                                                             <h3>Response</h3>
@@ -659,7 +632,7 @@
                                                     <a id="property_value"> </a>
                             <div class="element clickable property  protected property_value" data-toggle="collapse" data-target=".property_value .collapse">
                                 <h2>One of: null, &#039;asc&#039;, &#039;desc&#039;</h2>
-                                <pre>value : mixed</pre>
+                                <pre>value : string|null</pre>
                                 <div class="labels">
                                                                                                         </div>
                                 <div class="row collapse">
@@ -678,7 +651,7 @@
                                                                                     </table>
 
                                                                                     <h3>Type(s)</h3>
-                                            <code>mixed</code>
+                                            <code>string|null</code>
                                                                             </div>
                                 </div>
                             </div>
@@ -754,7 +727,7 @@
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by
             <a href="http://glyphicons.com/">Glyphicons</a>.<br/>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and<br/>
-            generated on Tue, 24 Jan 2017 20:10:24 +0100.<br/>
+            generated on Wed, 14 Feb 2018 22:00:35 +0100.<br/>
     </footer>
     </body>
 </html>

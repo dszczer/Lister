@@ -1,14 +1,13 @@
 <?php
 /**
  * Default controller to handle list with JavaScript.
- * @category     Controllers
- * @author       Damian Szczerbiński <dszczer@gmail.com>
+ * @category Controllers
+ * @author   Damian Szczerbiński <dszczer@gmail.com>
  */
 
 namespace Dszczer\ListerBundle\Controller;
 
 use Dszczer\ListerBundle\Lister\Lister;
-use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Class AsyncController
  * @package Dszczer\ListerBundle\Controller
+ * @since 0.9
  */
 class AsyncController extends Controller
 {
@@ -25,7 +25,7 @@ class AsyncController extends Controller
      * @param string $uuid Identifier of the list.
      * @return JsonResponse Response to handle by JavaScript.
      */
-    public function quickAction(Request $request, $uuid)
+    public function quickAction(Request $request, string $uuid): JsonResponse
     {
         try {
             if (!Lister::getFromSession($request->getSession(), $uuid) instanceof Lister) {
@@ -37,7 +37,7 @@ class AsyncController extends Controller
             $pager = $list->getPager();
             $result = [];
             foreach ($pager->getResults() as $object) {
-                if ($object instanceof ActiveRecordInterface) {
+                if (is_object($object)) {
                     $data = [];
                     foreach ($list->getHydratedElements($object) as $element) {
                         $data[$element->getName()] = $element->getData();
@@ -46,6 +46,7 @@ class AsyncController extends Controller
                 }
             }
 
+            $twig = $this->get('twig');
             $response = new JsonResponse(
                 [
                     'id' => $list->getId(),
@@ -54,9 +55,9 @@ class AsyncController extends Controller
                     'firstPage' => 1,
                     'lastPage' => $pager->getLastPage(),
                     'currentPage' => $pager->getPage(),
-                    'listHTML' => $this->callTwigFunction('lister_body', [$list]),
-                    'filterHTML' => $this->callTwigFunction('lister_filters', [$list]),
-                    'paginationHTML' => $this->callTwigFunction('lister_pagination', [$list]),
+                    'listHTML' => $twig->render($list->getListLayout(true), [$list]),
+                    'filterHTML' => $twig->render($list->getFilterLayout(true), [$list]),
+                    'paginationHTML' => $twig->render($list->getPaginationLayout(true), [$list]),
                     'status' => [
                         'type' => 'OK',
                         'message' => '',
@@ -71,7 +72,8 @@ class AsyncController extends Controller
                         'type' => 'ERROR',
                         'message' => $throwable->getMessage(),
                     ],
-                ], 500
+                ],
+                500
             );
         } finally {
             $response->setCache(
@@ -89,13 +91,15 @@ class AsyncController extends Controller
 
     /**
      * Helper to call loaded Twig function.
+     * @deprecated This method is deprecated and will be removed in 1.0 version.
      * @param string $name Twig name of the function
      * @param array $argv Array of arguments to pass
      * @return mixed Value returned by called function
      * @throws \Twig_Error_Runtime Twig error
      */
-    private function callTwigFunction($name, array $argv)
+    private function callTwigFunction(string $name, array $argv)
     {
+        trigger_error('Method is deprecated', E_USER_DEPRECATED);
         $env = $this->get('twig');
         /** @var \Twig_SimpleFunction $function */
         $function = $env->getFunction($name);
@@ -112,4 +116,5 @@ class AsyncController extends Controller
 
         return call_user_func_array($function->getCallable(), $argv);
     }
+
 }

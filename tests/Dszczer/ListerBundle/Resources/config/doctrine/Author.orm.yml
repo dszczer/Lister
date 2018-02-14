@@ -1,0 +1,24 @@
+Dszczer\ListerBundle\Entity\Author:
+  type: entity
+  table: author
+  id:
+    id:
+      type: integer
+      generator: { strategy: AUTO }
+  fields:
+    firstName:
+      type: string
+      length: 50
+      nullable: false
+    lastName:
+      type: string
+      length: 75
+      nullable: false
+    email:
+      type: string
+      length: 150
+      nullable: false
+  oneToMany:
+    books:
+      targetEntity: Book
+      mappedBy: id

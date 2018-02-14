@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta charset="utf-8"/>
-    <title>    API Documentation &raquo; \Dszczer\ListerBundle\Lister\Lister
+    <title>    Dszczer Lister &raquo; \Dszczer\ListerBundle\Lister\Lister
 </title>
     <meta name="author" content=""/>
     <meta name="description" content=""/>
@@ -33,7 +33,7 @@
                 <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                     <span class="icon-bar"></span> <span class="icon-bar"></span>
                     <span class="icon-bar"></span> </a>
-                <a class="brand" href="../index.html">API Documentation</a>
+                <a class="brand" href="../index.html">Dszczer Lister</a>
 
                 <div class="nav-collapse">
                     <ul class="nav">
@@ -246,8 +246,8 @@
     </li>
 
                                                                                                         <li class="method public">
-        <a href="#method_getPager" title="getPager :: Get Propel pagination helper or null if list was not applied yet.">
-            <span class="description">Get Propel pagination helper or null if list was not applied yet.</span><pre>getPager</pre>
+        <a href="#method_getPager" title="getPager :: Get pagination helper or null if list was not applied yet.">
+            <span class="description">Get pagination helper or null if list was not applied yet.</span><pre>getPager</pre>
         </a>
     </li>
 
@@ -270,8 +270,14 @@
     </li>
 
                                                                                                         <li class="method public">
-        <a href="#method_getQuery" title="getQuery :: Get external query object if set.">
-            <span class="description">Get external query object if set.</span><pre>getQuery</pre>
+        <a href="#method_getQuery" title="getQuery :: Get external query object, if set.">
+            <span class="description">Get external query object, if set.</span><pre>getQuery</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_getRepository" title="getRepository :: Get related Doctrine repository, if set.">
+            <span class="description">Get related Doctrine repository, if set.</span><pre>getRepository</pre>
         </a>
     </li>
 
@@ -332,6 +338,12 @@
                                                                                                         <li class="method public">
         <a href="#method_isPersist" title="isPersist :: Check if list can be stored in session.">
             <span class="description">Check if list can be stored in session.</span><pre>isPersist</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_isSerializable" title="isSerializable :: Can Lister object be serialized?">
+            <span class="description">Can Lister object be serialized?</span><pre>isSerializable</pre>
         </a>
     </li>
 
@@ -432,6 +444,12 @@
     </li>
 
                                                                                                         <li class="method public">
+        <a href="#method_setRepository" title="setRepository :: Set external repository object to use as base for filtering, paginating and sorting.">
+            <span class="description">Set external repository object to use as base for filtering, paginating and sorting.</span><pre>setRepository</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
         <a href="#method_setSorters" title="setSorters :: Replace sorters with new ones.">
             <span class="description">Replace sorters with new ones.</span><pre>setSorters</pre>
         </a>
@@ -469,7 +487,7 @@
                                 <span class="description">Build sorter form.</span><pre>buildSorterForm</pre>
                             </a>
                         </li>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <li class="method protected">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <li class="method protected">
                             <a href="#method_prepareElement" title="prepareElement :: Store data in single Element.">
                                 <span class="description">Store data in single Element.</span><pre>prepareElement</pre>
                             </a>
@@ -479,11 +497,11 @@
                                 <span class="description">Resolve some mandatory options.</span><pre>resolveCustomOptions</pre>
                             </a>
                         </li>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </ul>
         </li>
         <li class="nav-header private">» Private
             <ul>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </ul>
         </li>
         <li class="nav-header">
             <i class="icon-custom icon-constant"></i> Constants
@@ -520,13 +538,22 @@
                                                                                 <p>Dszczer\ListerBundle</p>
                                     </td>
                                 </tr>
+                                                                                                                <tr>
+                                    <th>
+                                        since
+                                                                            </th>
+                                    <td>
+                                                                                    0.9
+                                                                                
+                                    </td>
+                                </tr>
                                                                                                                                                                                 </table>
 
                     <h3><i class="icon-custom icon-method"></i> Methods</h3>
                                                                 <a id="method___construct"></a>
                         <div class="element clickable method public  method___construct" data-toggle="collapse" data-target=".method___construct .collapse">
                             <h2>Lister constructor.</h2>
-                            <pre>__construct(string $id = &#039;&#039;, string $modelClass = &#039;&#039;) </pre>
+                            <pre>__construct(string|null $id = null, string|null|\Doctrine\ORM\EntityRepository $queryClassNameOrRepository = null) </pre>
                             <div class="labels">
                                                                                                                                                                                             </div>
 
@@ -543,16 +570,25 @@
                                                 <td>
                                                                                                     </td>
                                             </tr>
-                                                                                                                    </table>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\Dszczer\ListerBundle\Lister\ListerException</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
 
                                                                             <h3>Arguments</h3>
                                                                                     <div class="subelement argument">
                                                 <h4>$id</h4>
-                                                <code>string</code><p><p>Unique identifier</p></p>
+                                                <code>string|null</code><p><p>Unique identifier</p></p>
                                             </div>
                                                                                     <div class="subelement argument">
-                                                <h4>$modelClass</h4>
-                                                <code>string</code><p><p>Full class name of ModelCriteria's child object</p></p>
+                                                <h4>$queryClassNameOrRepository</h4>
+                                                <code>string|null|\Doctrine\ORM\EntityRepository</code><p><p>Full class name of Propel ModelCriteria or Doctrine Repository object</p></p>
                                             </div>
                                                                             
                                                                     </div>
@@ -707,7 +743,16 @@
                                     <div class="long_description"></div>
 
                                     <table class="table">
-                                                                                                                    </table>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\Dszczer\ListerBundle\Filter\FilterException</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
 
                                                                             <h3>Arguments</h3>
                                                                                     <div class="subelement argument">
@@ -845,6 +890,14 @@
                                                 <td>
                                                     <dl>
                                                                                                             <dt>\Dszczer\ListerBundle\Lister\ListerException</dt>
+                                                        <dd></dd>
+                                                                                                            <dt>\Doctrine\ORM\NoResultException</dt>
+                                                        <dd></dd>
+                                                                                                            <dt>\Doctrine\ORM\NonUniqueResultException</dt>
+                                                        <dd></dd>
+                                                                                                            <dt>\Dszczer\ListerBundle\Filter\FilterException</dt>
+                                                        <dd></dd>
+                                                                                                            <dt>\Dszczer\ListerBundle\Sorter\SorterException</dt>
                                                         <dd></dd>
                                                                                                                                                             </dl>
                                                 </td>
@@ -1034,7 +1087,7 @@
                                             <a id="method_getElements"></a>
                         <div class="element clickable method public  method_getElements" data-toggle="collapse" data-target=".method_getElements .collapse">
                             <h2>Get array of elements.</h2>
-                            <pre>getElements() : array&lt;mixed,\Dszczer\ListerBundle\Element\Element&gt;</pre>
+                            <pre>getElements() : array&lt;mixed,\Dszczer\ListerBundle\Element\Element&gt;|array</pre>
                             <div class="labels">
                                                                                                                                                                                             </div>
 
@@ -1055,7 +1108,7 @@
 
                                     
                                                                             <h3>Response</h3>
-                                        <code>array&lt;mixed,<a href="../classes/Dszczer.ListerBundle.Element.Element.html">\Dszczer\ListerBundle\Element\Element</a>&gt;</code><p></p>
+                                        <code>array&lt;mixed,<a href="../classes/Dszczer.ListerBundle.Element.Element.html">\Dszczer\ListerBundle\Element\Element</a>&gt;|array</code><p></p>
                                                                     </div>
                             </div>
 
@@ -1146,7 +1199,7 @@
                                             <a id="method_getFilters"></a>
                         <div class="element clickable method public  method_getFilters" data-toggle="collapse" data-target=".method_getFilters .collapse">
                             <h2>Get array of filters.</h2>
-                            <pre>getFilters() : array&lt;mixed,\Dszczer\ListerBundle\Filter\Filter&gt;</pre>
+                            <pre>getFilters() : array&lt;mixed,\Dszczer\ListerBundle\Filter\Filter&gt;|array</pre>
                             <div class="labels">
                                                                                                                                                                                             </div>
 
@@ -1167,7 +1220,7 @@
 
                                     
                                                                             <h3>Response</h3>
-                                        <code>array&lt;mixed,<a href="../classes/Dszczer.ListerBundle.Filter.Filter.html">\Dszczer\ListerBundle\Filter\Filter</a>&gt;</code><p></p>
+                                        <code>array&lt;mixed,<a href="../classes/Dszczer.ListerBundle.Filter.Filter.html">\Dszczer\ListerBundle\Filter\Filter</a>&gt;|array</code><p></p>
                                                                     </div>
                             </div>
 
@@ -1185,7 +1238,16 @@
                                     <div class="long_description"></div>
 
                                     <table class="table">
-                                                                                                                    </table>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\Exception</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
 
                                                                             <h3>Arguments</h3>
                                                                                     <div class="subelement argument">
@@ -1206,7 +1268,7 @@
                                             <a id="method_getHydratedElements"></a>
                         <div class="element clickable method public  method_getHydratedElements" data-toggle="collapse" data-target=".method_getHydratedElements .collapse">
                             <h2>Get elements with stored data in them, ready to be displayed.</h2>
-                            <pre>getHydratedElements(mixed $data = null) : array&lt;mixed,\Dszczer\ListerBundle\Element\Element&gt;</pre>
+                            <pre>getHydratedElements(mixed $data = null) : array&lt;mixed,\Dszczer\ListerBundle\Element\Element&gt;|array</pre>
                             <div class="labels">
                                                                                                                                                                                             </div>
 
@@ -1225,7 +1287,7 @@
                                             </div>
                                                                             
                                                                             <h3>Response</h3>
-                                        <code>array&lt;mixed,<a href="../classes/Dszczer.ListerBundle.Element.Element.html">\Dszczer\ListerBundle\Element\Element</a>&gt;</code><p></p>
+                                        <code>array&lt;mixed,<a href="../classes/Dszczer.ListerBundle.Element.Element.html">\Dszczer\ListerBundle\Element\Element</a>&gt;|array</code><p></p>
                                                                     </div>
                             </div>
 
@@ -1288,8 +1350,8 @@
                         </div>
                                             <a id="method_getPager"></a>
                         <div class="element clickable method public  method_getPager" data-toggle="collapse" data-target=".method_getPager .collapse">
-                            <h2>Get Propel pagination helper or null if list was not applied yet.</h2>
-                            <pre>getPager() : \Propel\Runtime\Util\PropelModelPager|null</pre>
+                            <h2>Get pagination helper or null if list was not applied yet.</h2>
+                            <pre>getPager() : \Dszczer\ListerBundle\Lister\PagerHelper|null</pre>
                             <div class="labels">
                                                                                                                                                                                             </div>
 
@@ -1310,7 +1372,7 @@
 
                                     
                                                                             <h3>Response</h3>
-                                        <code>\Propel\Runtime\Util\PropelModelPager|null</code><p></p>
+                                        <code><a href="../classes/Dszczer.ListerBundle.Lister.PagerHelper.html">\Dszczer\ListerBundle\Lister\PagerHelper</a>|null</code><p></p>
                                                                     </div>
                             </div>
 
@@ -1402,8 +1464,8 @@
                         </div>
                                             <a id="method_getQuery"></a>
                         <div class="element clickable method public  method_getQuery" data-toggle="collapse" data-target=".method_getQuery .collapse">
-                            <h2>Get external query object if set.</h2>
-                            <pre>getQuery(boolean $clone = true) : \Propel\Runtime\ActiveQuery\ModelCriteria|null</pre>
+                            <h2>Get external query object, if set.</h2>
+                            <pre>getQuery(boolean $clone = true) : \Propel\Runtime\ActiveQuery\ModelCriteria|\Doctrine\ORM\QueryBuilder|null</pre>
                             <div class="labels">
                                                                                                                                                                                             </div>
 
@@ -1422,7 +1484,45 @@
                                             </div>
                                                                             
                                                                             <h3>Response</h3>
-                                        <code>\Propel\Runtime\ActiveQuery\ModelCriteria|null</code><p></p>
+                                        <code>\Propel\Runtime\ActiveQuery\ModelCriteria|\Doctrine\ORM\QueryBuilder|null</code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_getRepository"></a>
+                        <div class="element clickable method public  method_getRepository" data-toggle="collapse" data-target=".method_getRepository .collapse">
+                            <h2>Get related Doctrine repository, if set.</h2>
+                            <pre>getRepository() : \Doctrine\ORM\EntityRepository|null|string</pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    since
+                                                </th>
+                                                <td>
+                                                                                                                                                                        1.0
+                                                                                                                                                                        
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                    </table>
+
+                                    
+                                                                            <h3>Response</h3>
+                                        <code>\Doctrine\ORM\EntityRepository|null|string</code><p></p>
                                                                     </div>
                             </div>
 
@@ -1493,7 +1593,7 @@
                                             <a id="method_getSorters"></a>
                         <div class="element clickable method public  method_getSorters" data-toggle="collapse" data-target=".method_getSorters .collapse">
                             <h2>Get array of sorters.</h2>
-                            <pre>getSorters() : array&lt;mixed,\Dszczer\ListerBundle\Sorter\Sorter&gt;</pre>
+                            <pre>getSorters() : array&lt;mixed,\Dszczer\ListerBundle\Sorter\Sorter&gt;|array</pre>
                             <div class="labels">
                                                                                                                                                                                             </div>
 
@@ -1514,7 +1614,7 @@
 
                                     
                                                                             <h3>Response</h3>
-                                        <code>array&lt;mixed,<a href="../classes/Dszczer.ListerBundle.Sorter.Sorter.html">\Dszczer\ListerBundle\Sorter\Sorter</a>&gt;</code><p></p>
+                                        <code>array&lt;mixed,<a href="../classes/Dszczer.ListerBundle.Sorter.Sorter.html">\Dszczer\ListerBundle\Sorter\Sorter</a>&gt;|array</code><p></p>
                                                                     </div>
                             </div>
 
@@ -1561,7 +1661,16 @@
                                     <div class="long_description"></div>
 
                                     <table class="table">
-                                                                                                                    </table>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\Dszczer\ListerBundle\Lister\ListerException</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
 
                                                                             <h3>Arguments</h3>
                                                                                     <div class="subelement argument">
@@ -1714,6 +1823,35 @@
                             </div>
 
                         </div>
+                                            <a id="method_isSerializable"></a>
+                        <div class="element clickable method public  method_isSerializable" data-toggle="collapse" data-target=".method_isSerializable .collapse">
+                            <h2>Can Lister object be serialized?</h2>
+                            <pre>isSerializable() : boolean</pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                    </table>
+
+                                    
+                                                                            <h3>Response</h3>
+                                        <code>boolean</code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
                                             <a id="method_prepareElement"></a>
                         <div class="element clickable method protected  method_prepareElement" data-toggle="collapse" data-target=".method_prepareElement .collapse">
                             <h2>Store data in single Element.</h2>
@@ -1812,7 +1950,16 @@
                                     <div class="long_description"></div>
 
                                     <table class="table">
-                                                                                                                    </table>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\Exception</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
 
                                                                             <h3>Arguments</h3>
                                                                                     <div class="subelement argument">
@@ -1913,7 +2060,16 @@
                                                 <td>
                                                                                                     </td>
                                             </tr>
-                                                                                                                    </table>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\Dszczer\ListerBundle\Lister\UnserializableException</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
 
                                     
                                                                             <h3>Response</h3>
@@ -1935,7 +2091,16 @@
                                     <div class="long_description"></div>
 
                                     <table class="table">
-                                                                                                                    </table>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\Dszczer\ListerBundle\Lister\ListerException</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
 
                                                                             <h3>Arguments</h3>
                                                                                     <div class="subelement argument">
@@ -2203,7 +2368,7 @@
                                             <a id="method_setQuery"></a>
                         <div class="element clickable method public  method_setQuery" data-toggle="collapse" data-target=".method_setQuery .collapse">
                             <h2>Set external query object to use as base for filtering, paginating and sorting.</h2>
-                            <pre>setQuery(\Propel\Runtime\ActiveQuery\ModelCriteria $query) : \Dszczer\ListerBundle\Lister\Lister</pre>
+                            <pre>setQuery(\Propel\Runtime\ActiveQuery\ModelCriteria|\Doctrine\ORM\QueryBuilder $query) : \Dszczer\ListerBundle\Lister\Lister</pre>
                             <div class="labels">
                                                                                                                                                                                             </div>
 
@@ -2218,7 +2383,43 @@
                                                                             <h3>Arguments</h3>
                                                                                     <div class="subelement argument">
                                                 <h4>$query</h4>
-                                                <code>\Propel\Runtime\ActiveQuery\ModelCriteria</code><p><p>|null</p></p>
+                                                <code>\Propel\Runtime\ActiveQuery\ModelCriteria|\Doctrine\ORM\QueryBuilder</code><p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code><a href="../classes/Dszczer.ListerBundle.Lister.Lister.html">\Dszczer\ListerBundle\Lister\Lister</a></code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_setRepository"></a>
+                        <div class="element clickable method public  method_setRepository" data-toggle="collapse" data-target=".method_setRepository .collapse">
+                            <h2>Set external repository object to use as base for filtering, paginating and sorting.</h2>
+                            <pre>setRepository(\Doctrine\ORM\EntityRepository $repository) : \Dszczer\ListerBundle\Lister\Lister</pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    since
+                                                </th>
+                                                <td>
+                                                                                                                                                                        1.0
+                                                                                                                                                                        
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$repository</h4>
+                                                <code>\Doctrine\ORM\EntityRepository</code><p></p>
                                             </div>
                                                                             
                                                                             <h3>Response</h3>
@@ -2342,6 +2543,8 @@
                                                     <dl>
                                                                                                             <dt>\InvalidArgumentException</dt>
                                                         <dd></dd>
+                                                                                                            <dt>\Exception</dt>
+                                                        <dd></dd>
                                                                                                                                                             </dl>
                                                 </td>
                                             </tr>
@@ -2411,7 +2614,7 @@
                                                     <a id="property_query"> </a>
                             <div class="element clickable property  protected property_query" data-toggle="collapse" data-target=".property_query .collapse">
                                 <h2>Query to use when applying list</h2>
-                                <pre>query : \Propel\Runtime\ActiveQuery\ModelCriteria</pre>
+                                <pre>query : \Propel\Runtime\ActiveQuery\ModelCriteria|\Doctrine\ORM\QueryBuilder|null</pre>
                                 <div class="labels">
                                                                                                         </div>
                                 <div class="row collapse">
@@ -2430,14 +2633,14 @@
                                                                                     </table>
 
                                                                                     <h3>Type(s)</h3>
-                                            <code>\Propel\Runtime\ActiveQuery\ModelCriteria</code>
+                                            <code>\Propel\Runtime\ActiveQuery\ModelCriteria|\Doctrine\ORM\QueryBuilder|null</code>
                                                                             </div>
                                 </div>
                             </div>
                                                     <a id="property_externalQuery"> </a>
                             <div class="element clickable property  protected property_externalQuery" data-toggle="collapse" data-target=".property_externalQuery .collapse">
                                 <h2>Query from external source</h2>
-                                <pre>externalQuery : \Propel\Runtime\ActiveQuery\ModelCriteria|null</pre>
+                                <pre>externalQuery : \Propel\Runtime\ActiveQuery\ModelCriteria|\Doctrine\ORM\QueryBuilder|null</pre>
                                 <div class="labels">
                                                                                                         </div>
                                 <div class="row collapse">
@@ -2456,7 +2659,33 @@
                                                                                     </table>
 
                                                                                     <h3>Type(s)</h3>
-                                            <code>\Propel\Runtime\ActiveQuery\ModelCriteria|null</code>
+                                            <code>\Propel\Runtime\ActiveQuery\ModelCriteria|\Doctrine\ORM\QueryBuilder|null</code>
+                                                                            </div>
+                                </div>
+                            </div>
+                                                    <a id="property_repository"> </a>
+                            <div class="element clickable property  protected property_repository" data-toggle="collapse" data-target=".property_repository .collapse">
+                                <h2>Doctrine Entity repository @since 1.0</h2>
+                                <pre>repository : \Doctrine\ORM\EntityRepository|null</pre>
+                                <div class="labels">
+                                                                                                        </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description"></div>
+
+                                        <table class="table">
+                                                                                            <tr>
+                                                    <th>
+                                                        var
+                                                    </th>
+                                                    <td>
+                                                                                                                    <p>Doctrine Entity repository @since 1.0</p>
+                                                                                                            </td>
+                                                </tr>
+                                                                                    </table>
+
+                                                                                    <h3>Type(s)</h3>
+                                            <code>\Doctrine\ORM\EntityRepository|null</code>
                                                                             </div>
                                 </div>
                             </div>
@@ -2541,7 +2770,7 @@
                                                     <a id="property_pager"> </a>
                             <div class="element clickable property  protected property_pager" data-toggle="collapse" data-target=".property_pager .collapse">
                                 <h2>Pagination helper</h2>
-                                <pre>pager : \Propel\Runtime\Util\PropelModelPager</pre>
+                                <pre>pager : \Dszczer\ListerBundle\Lister\PagerHelper</pre>
                                 <div class="labels">
                                                                                                         </div>
                                 <div class="row collapse">
@@ -2560,14 +2789,14 @@
                                                                                     </table>
 
                                                                                     <h3>Type(s)</h3>
-                                            <code>\Propel\Runtime\Util\PropelModelPager</code>
+                                            <code><a href="../classes/Dszczer.ListerBundle.Lister.PagerHelper.html">\Dszczer\ListerBundle\Lister\PagerHelper</a></code>
                                                                             </div>
                                 </div>
                             </div>
-                                                    <a id="property_perpage"> </a>
-                            <div class="element clickable property  protected property_perpage" data-toggle="collapse" data-target=".property_perpage .collapse">
+                                                    <a id="property_perPage"> </a>
+                            <div class="element clickable property  protected property_perPage" data-toggle="collapse" data-target=".property_perPage .collapse">
                                 <h2>Quantity of rows per page</h2>
-                                <pre>perpage : integer</pre>
+                                <pre>perPage : integer</pre>
                                 <div class="labels">
                                                                                                         </div>
                                 <div class="row collapse">
@@ -2974,7 +3203,7 @@
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by
             <a href="http://glyphicons.com/">Glyphicons</a>.<br/>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and<br/>
-            generated on Tue, 24 Jan 2017 20:10:24 +0100.<br/>
+            generated on Wed, 14 Feb 2018 22:00:35 +0100.<br/>
     </footer>
     </body>
 </html>

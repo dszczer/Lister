@@ -1,13 +1,13 @@
 <?php
 /**
  * Sorter class representation.
- * @category     Sorter
- * @author       Damian Szczerbiński <dszczer@gmail.com>
+ * @category Sorter
+ * @author   Damian Szczerbiński <dszczer@gmail.com>
  */
 
 namespace Dszczer\ListerBundle\Sorter;
 
-use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\EntityRepository;
 use Dszczer\ListerBundle\Lister\Lister;
 use Dszczer\ListerBundle\Util\Helper;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -15,17 +15,22 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 /**
  * Class Filter
  * @package Dszczer\ListerBundle
+ * @since 0.9
  */
 class Sorter
 {
     /** @var string Name of sorter */
     protected $name;
+
     /** @var string Label of sorter */
     protected $label;
-    /** @var mixed One of: null, 'asc', 'desc' */
+
+    /** @var string|null One of: null, 'asc', 'desc' */
     protected $value;
+
     /** @var string Method to call */
     protected $sorterMethod;
+
     /** @var bool Flag to determine if method is set or not */
     protected $default = true;
 
@@ -36,25 +41,21 @@ class Sorter
      * @param string $method Method to call when applying sorter
      * @param mixed $value Value passed to method
      */
-    public function __construct($name = '', $label = '', $method = '', $value = null)
+    public function __construct(string $name = '', string $label = '', string $method = '', $value = null)
     {
         $this->name = $name;
         $this->label = $label;
-        $this->value = $value;
+        $this->sorterMethod = $method;
+        $this->setValue($value);
 
-        if (empty($method) && !empty($name)) {
-            $this->sorterMethod = Helper::camelize("order_by_$name");
-        } else {
-            $this->default = false;
-            $this->sorterMethod = $method;
-        }
+        $this->default = empty($method) && !empty($name);
     }
 
     /**
      * Get sorter name.
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -64,7 +65,7 @@ class Sorter
      * @param string $name
      * @return Sorter
      */
-    public function setName($name)
+    public function setName(string $name): Sorter
     {
         $this->name = $name;
 
@@ -75,7 +76,7 @@ class Sorter
      * Get sorter label.
      * @return string
      */
-    public function getLabel()
+    public function getLabel(): string
     {
         return $this->label;
     }
@@ -85,7 +86,7 @@ class Sorter
      * @param string $label
      * @return Sorter
      */
-    public function setLabel($label)
+    public function setLabel(string $label): Sorter
     {
         $this->label = $label;
 
@@ -94,7 +95,7 @@ class Sorter
 
     /**
      * Get sorting value.
-     * @return mixed
+     * @return string|null
      */
     public function getValue()
     {
@@ -103,12 +104,12 @@ class Sorter
 
     /**
      * Set sorting value.
-     * @param mixed $value
+     * @param string|null $value
      * @return Sorter
      */
-    public function setValue($value)
+    public function setValue($value): Sorter
     {
-        $this->value = $value;
+        $this->value = $value === null ? null : mb_strtoupper(trim($value));
 
         return $this;
     }
@@ -117,7 +118,7 @@ class Sorter
      * Get method name.
      * @return string
      */
-    public function getSorterMethod()
+    public function getSorterMethod(): string
     {
         return $this->sorterMethod;
     }
@@ -127,7 +128,7 @@ class Sorter
      * @param string $sorterMethod
      * @return Sorter
      */
-    public function setSorterMethod($sorterMethod)
+    public function setSorterMethod(string $sorterMethod): Sorter
     {
         $this->default = false;
         $this->sorterMethod = $sorterMethod;
@@ -139,7 +140,7 @@ class Sorter
      * Check if method is defined or not.
      * @return bool True for defined method, false for default generated stub
      */
-    public function isDefaultMethod()
+    public function isDefaultMethod(): bool
     {
         return $this->default;
     }
@@ -153,29 +154,38 @@ class Sorter
      */
     public function apply(Lister $lister, array $extraArguments = [])
     {
-        if (in_array($this->value, [Criteria::ASC, Criteria::DESC])) {
+        if (in_array($this->value, ['ASC', 'DESC'])) {
             $query = $lister->getQuery(false);
-            if ($query instanceof ModelCriteria) {
-                return $this->rawApply(
-                    $query,
-                    array_merge(is_array($this->value) ? $this->value : [$this->value], $extraArguments)
-                );
+            if (is_object($query)) {
+                if($this->default) {
+                    $this->sorterMethod = Helper::camelize("order_by_{$this->name}");
+                }
+                if($query instanceof ModelCriteria) {
+                    return call_user_func_array(
+                        [$query, $this->sorterMethod],
+                        array_merge(is_array($this->value) ? $this->value : [$this->value], $extraArguments)
+                    );
+                } else {
+                    $aliases = $query->getRootAliases();
+                    $alias = array_shift($aliases);
+                    $repository = $lister->getRepository();
+                    if ($repository instanceof EntityRepository && method_exists($repository, $this->sorterMethod)) {
+                        return call_user_func_array(
+                            [$repository, $this->sorterMethod],
+                            array_merge([$query, $this->value], $extraArguments)
+                        );
+                    } elseif($this->value === 'ASC') {
+                        if($this->default) {
+                            $this->sorterMethod = $this->name;
+                        }
+                        return $query->addOrderBy($alias . '.' . $this->sorterMethod, $this->value);
+                    }
+                }
             } else {
                 throw new SorterException('Lister is not ready to apply sorter - missing assigned query object');
             }
         }
 
         return null;
-    }
-
-    /**
-     * Call method on object.
-     * @param ModelCriteria $query
-     * @param array $args
-     * @return mixed
-     */
-    protected function rawApply(ModelCriteria $query, array $args)
-    {
-        return call_user_func_array([$query, $this->sorterMethod], $args);
     }
 }

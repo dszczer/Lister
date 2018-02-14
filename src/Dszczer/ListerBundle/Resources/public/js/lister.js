@@ -406,8 +406,4 @@ if (typeof jQuery === "undefined") {
       }
     }
   }
-
-  /*
-   * Helpers
-   */
 })(jQuery);

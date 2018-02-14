@@ -1,7 +1,12 @@
 services:
     lister.factory:
         class: Dszczer\ListerBundle\Lister\Factory
-        arguments: ['@form.factory', '@router', '%lister_config%']
+        arguments:
+            - '@form.factory'
+            - '@router'
+            - '%lister_config%'
+            - '@?doctrine'
+            - '@?form.csrf_provider'
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 

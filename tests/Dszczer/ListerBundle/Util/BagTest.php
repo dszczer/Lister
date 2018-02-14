@@ -2,13 +2,17 @@
 
 namespace Dszczer\ListerBundle\Util;
 
+/**
+ * Class BagTest
+ * @package Dszczer\ListerBundle\Util
+ */
 class BagTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
         new Bag();
     }
-    
+
     /**
      * @depends testConstructor
      */

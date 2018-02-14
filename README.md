@@ -9,21 +9,25 @@
 ### Symfony ~2.8
 #### (Symfony ~3.0 not tested, may work)
 
-### Propel ORM ~2.0
+### Doctrine ORM ~2.0 or Propel ORM ~2.0
 #### (Propel ~3.0 not tested)
 
 ## Installation
 
 1. Copy files via Composer: `composer require dszczer/lister`.
-2. Place configuration:
+2. Place configuration if needed:
 ```yaml
 # app/config.yml
 
-# Lister Configuration
+# Full Lister Configuration
 lister:
-    perpage: 15
-    form_name_prefix: lister_forms
-    use_csrf: false
+    orm: auto # [auto, doctrine, propel]; 'auto' for auto detection, and using both of ORMs simultaneously also
+    perpage: 25 # any integer above 0
+    form_name_prefix: 'lister_filters'
+    use_csrf: true
+    
+# Minimum Lister Configuration
+# Above values are default ones, no need to place any configuarion node
 ```
 3. Add routing:
 ```yaml
@@ -46,6 +50,7 @@ $bundles = [
 
 ## Basic usage
 ```php
+<?php
 // src/AppBundle/Controller/AppController.php
 
 public function listAction(Request $request)
@@ -65,7 +70,7 @@ public function listAction(Request $request)
         ->addField('email', 'E-mail', true, Filter::TYPE_TEXT);
     
     return $this->render(
-        'AppBundle:User:listUser.html.twig',
+        'AppBundle:User:list.html.twig',
         ['list' => $list->apply($request)]
     );
 }

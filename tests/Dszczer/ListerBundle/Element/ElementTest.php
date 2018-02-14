@@ -2,11 +2,17 @@
 
 namespace Dszczer\ListerBundle\Element;
 
-
 use Dszczer\ListerBundle\Author;
 
+/**
+ * Class ElementTest
+ * @package Dszczer\ListerBundle\Element
+ */
 class ElementTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @throws ElementException
+     */
     public function testConstructorNoArgs()
     {
         $element = new Element();
@@ -19,6 +25,7 @@ class ElementTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testConstructorNoArgs
+     * @throws ElementException
      */
     public function testConstructorTypicalUse()
     {
@@ -32,6 +39,7 @@ class ElementTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testConstructorTypicalUse
+     * @throws ElementException
      */
     public function testInvalidMethod()
     {
@@ -42,6 +50,7 @@ class ElementTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testConstructorTypicalUse
+     * @throws ElementException
      */
     public function testInvalidCallable()
     {
@@ -53,6 +62,7 @@ class ElementTest extends \PHPUnit_Framework_TestCase
     /**
      * @depends testInvalidMethod
      * @depends testInvalidCallable
+     * @throws ElementException
      */
     public function testGettersAndSetters()
     {

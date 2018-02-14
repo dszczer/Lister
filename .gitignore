@@ -6,4 +6,10 @@ vendor/
 
 # Propel runtime config
 /tests/Propel
+
+# Database
 /tests/test.sq3
+
+# Cache and temporary files
+/tests/var/
+/docs/phpdoc-cache-*

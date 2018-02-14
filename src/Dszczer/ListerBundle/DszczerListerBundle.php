@@ -1,8 +1,8 @@
 <?php
 /**
  * Bundle configuration.
- * @category     Bundle configuration
- * @author       Damian Szczerbiński <dszczer@gmail.com>
+ * @category Bundle configuration
+ * @author   Damian Szczerbiński <dszczer@gmail.com>
  */
 
 namespace Dszczer\ListerBundle;
@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 /**
  * Class DszczerListerBundle
  * @package Dszczer\ListerBundle
+ * @since 0.9
  */
 class DszczerListerBundle extends Bundle
 {

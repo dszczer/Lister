@@ -1,8 +1,8 @@
 <?php
 /**
  * Sorter bag representation.
- * @category     Sorter
- * @author       Damian Szczerbiński <dszczer@gmail.com>
+ * @category Sorter
+ * @author   Damian Szczerbiński <dszczer@gmail.com>
  */
 
 namespace Dszczer\ListerBundle\Sorter;
@@ -12,6 +12,7 @@ use Dszczer\ListerBundle\Util\Bag;
 /**
  * Class SorterBag
  * @package Dszczer\ListerBundle
+ * @since 0.9
  */
 class SorterBag extends Bag
 {

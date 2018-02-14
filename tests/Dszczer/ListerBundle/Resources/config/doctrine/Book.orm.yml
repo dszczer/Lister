@@ -1,0 +1,23 @@
+Dszczer\ListerBundle\Entity\Book:
+  type: entity
+  table: book
+  id:
+    id:
+      type: integer
+      generator: { strategy: AUTO }
+  fields:
+    title:
+      type: string
+      length: 255
+      nullable: false
+    isbn:
+      type: string
+      length: 60
+      nullable: false
+  manyToOne:
+    author:
+      targetEntity: Author
+      inversedBy: id
+      joinColumn:
+        name: author_id
+        referencedColumnName: id

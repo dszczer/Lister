@@ -1,12 +1,14 @@
 <?php
 /**
  * Lister class representation.
- * @category     Lister
- * @author       Damian Szczerbiński <dszczer@gmail.com>
+ * @category Lister
+ * @author   Damian Szczerbiński <dszczer@gmail.com>
  */
 
 namespace Dszczer\ListerBundle\Lister;
 
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Dszczer\ListerBundle\Element\Element;
 use Dszczer\ListerBundle\Element\ElementBag;
 use Dszczer\ListerBundle\Filter\Filter;
@@ -16,7 +18,6 @@ use Dszczer\ListerBundle\Sorter\SorterBag;
 use Dszczer\ListerBundle\Util\Helper;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Propel\Runtime\Util\PropelModelPager;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -30,6 +31,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Class Lister
  * @package Dszczer\ListerBundle
+ * @since 0.9
  */
 class Lister
 {
@@ -38,63 +40,95 @@ class Lister
 
     /** @var  string UUID */
     protected $id = '';
-    /** @var  ModelCriteria Query to use when applying list */
+
+    /** @var  ModelCriteria|QueryBuilder|null Query to use when applying list */
     protected $query;
-    /** @var  ModelCriteria|null Query from external source */
+
+    /** @var  ModelCriteria|QueryBuilder|null Query from external source */
     protected $externalQuery;
+
+    /** @var  EntityRepository|null Doctrine Entity repository @since 1.0 */
+    protected $repository;
+
     /** @var  FilterBag Bag of filters */
     protected $filters;
+
     /** @var  SorterBag Bag of sorters */
     protected $sorters;
+
     /** @var  ElementBag Bag of elements */
     protected $elements;
-    /** @var  PropelModelPager Pagination helper */
+
+    /** @var  PagerHelper Pagination helper */
     protected $pager;
+
     /** @var  int Quantity of rows per page */
-    protected $perpage = 0;
+    protected $perPage = 0;
+
     /** @var  int Current page */
     protected $currentPage = 1;
+
     /** @var  boolean Flag to persist Lister object into Session or not */
     protected $persist = true;
+
     /** @var  boolean Flag to determine dynamic (JavaScript) or static control of list */
     protected $dynamic = true;
+
     /** @var  bool Flag to rebuild query object when apply method is called */
     protected $rebuildQuery = false;
+
     /** @var  string Layout file for filter */
     protected $filterLayout = '@DszczerListerBundle:Lister:filter.html.twig';
+
     /** @var  string Layout file for list */
     protected $listLayout = '@DszczerListerBundle:Lister:table.html.twig';
+
     /** @var  string Layout file for single element */
     protected $elementLayout = '@DszczerListerBundle:Lister:tableElement.html.twig';
+
     /** @var  string Layout file for pagination */
     protected $paginationLayout = '@DszczerListerBundle:Lister:pagination.html.twig';
+
     /** @var  string Translation domain for views */
     protected $translationDomain = 'default';
+
     /** @var  FormBuilder|Form|null Filter form builder, when form not build, Form when form is built */
     protected $filterForm;
+
     /** @var  Form|null Empty filter form */
     protected $emptyFilterForm;
+
     /** @var  FormBuilder|null Sorter form builder */
     protected $sorterFormBuilder;
+
     /** @var  Router|null Router to generate paths */
     protected $router;
+
     /** @var array User defined options */
     protected $customOptions = [];
 
     /**
      * Lister constructor.
-     * @param string $id Unique identifier
-     * @param string $modelClass Full class name of ModelCriteria's child object
+     * @param string|null $id Unique identifier
+     * @param string|null|EntityRepository $queryClassNameOrRepository Full class name of Propel ModelCriteria or Doctrine Repository object
+     * @throws ListerException
      */
-    public function __construct($id = '', $modelClass = '')
+    public function __construct($id = null, $queryClassNameOrRepository = null)
     {
-        if (!empty($modelClass)) {
-            $query = new $modelClass();
-            if (!$query instanceof ModelCriteria) {
-                throw new \InvalidArgumentException('Class is not an instance of ModelCriteria');
+        if (!empty($queryClassNameOrRepository)) {
+            if ($queryClassNameOrRepository instanceof EntityRepository) {
+                // Doctrine
+                $this->repository = $queryClassNameOrRepository;
+                $this->query = $this->repository->createQueryBuilder('e');
+            } else {
+                // Propel
+                $query = new $queryClassNameOrRepository();
+                if (!$query instanceof ModelCriteria) {
+                    throw new \InvalidArgumentException('Class is not an instance of ModelCriteria');
+                }
+                unset($query);
+                $this->query = call_user_func($queryClassNameOrRepository . '::create');
             }
-            unset($query);
-            $this->query = call_user_func($modelClass.'::create');
         }
         $this->filters = new FilterBag();
         $this->sorters = new SorterBag();
@@ -113,9 +147,15 @@ class Lister
      * @param SessionInterface $session
      * @param string $uuid ID of the list to read from
      * @return Lister|null Lister for found one, null for not
+     * @throws \Exception
      */
-    public static function getFromSession(SessionInterface $session, $uuid)
+    public static function getFromSession(SessionInterface $session, string $uuid)
     {
+        if (!is_scalar($uuid)) {
+            throw new \InvalidArgumentException("Argument 'uuid' is not scalar");
+        }
+        $uuid = (string)$uuid;
+
         if ($session->has(static::SERIALIZED_STORAGE_NAME)) {
             $lists = $session->get(static::SERIALIZED_STORAGE_NAME, []);
             if (!empty($lists[$uuid])) {
@@ -139,8 +179,9 @@ class Lister
      * @param SessionInterface $session
      * @param string $uuid ID of the list to remove
      * @return bool True on success, false on failure
+     * @throws \Exception
      */
-    public static function removeFromSession(SessionInterface $session, $uuid)
+    public static function removeFromSession(SessionInterface $session, string $uuid): bool
     {
         if ($session->has(static::SERIALIZED_STORAGE_NAME)) {
             $lists = $session->get(static::SERIALIZED_STORAGE_NAME, []);
@@ -174,7 +215,7 @@ class Lister
      * @param bool $overwrite Overwrite existing object with same list's ID
      * @return bool True on success, false on failure
      */
-    public function storeInSession(SessionInterface $session, $overwrite = true)
+    public function storeInSession(SessionInterface $session, bool $overwrite = true): bool
     {
         $lists = $session->get(static::SERIALIZED_STORAGE_NAME, []);
         if (!$this->isPersist() || (isset($lists[$this->id]) && !$overwrite)) {
@@ -190,7 +231,7 @@ class Lister
      * Check if list should use Javascript or be static
      * @return bool True for Javascript, false for static
      */
-    public function isDynamic()
+    public function isDynamic(): bool
     {
         return $this->dynamic;
     }
@@ -200,7 +241,7 @@ class Lister
      * @param bool $dynamic
      * @return Lister
      */
-    public function setDynamic($dynamic)
+    public function setDynamic(bool $dynamic): Lister
     {
         $this->dynamic = $dynamic;
 
@@ -208,8 +249,8 @@ class Lister
     }
 
     /**
-     * Get Propel pagination helper or null if list was not applied yet.
-     * @return PropelModelPager|null
+     * Get pagination helper or null if list was not applied yet.
+     * @return PagerHelper|null
      */
     public function getPager()
     {
@@ -218,10 +259,10 @@ class Lister
 
     /**
      * Set external query object to use as base for filtering, paginating and sorting.
-     * @param ModelCriteria $query |null
+     * @param ModelCriteria|QueryBuilder $query
      * @return Lister
      */
-    public function setQuery(ModelCriteria $query)
+    public function setQuery($query): Lister
     {
         $this->query = $query;
         $this->externalQuery = clone $query;
@@ -230,13 +271,36 @@ class Lister
     }
 
     /**
-     * Get external query object if set.
+     * Get external query object, if set.
      * @param bool $clone True for cloned or false for original model criteria
-     * @return ModelCriteria|null
+     * @return ModelCriteria|QueryBuilder|null
      */
-    public function getQuery($clone = true)
+    public function getQuery(bool $clone = true)
     {
-        return $clone && $this->query instanceof ModelCriteria ? clone $this->query : $this->query;
+        return $clone && $this->query ? clone $this->query : $this->query;
+    }
+
+    /**
+     * Set external repository object to use as base for filtering, paginating and sorting.
+     * @param EntityRepository $repository
+     * @return Lister
+     * @since 1.0
+     */
+    public function setRepository(EntityRepository $repository): Lister
+    {
+        $this->repository = $repository;
+
+        return $this;
+    }
+
+    /**
+     * Get related Doctrine repository, if set.
+     * @return EntityRepository|null|string
+     * @since 1.0
+     */
+    public function getRepository()
+    {
+        return $this->repository;
     }
 
     /**
@@ -244,9 +308,9 @@ class Lister
      * @param int $int
      * @return Lister
      */
-    public function setPerPage($int)
+    public function setPerPage(int $int): Lister
     {
-        $this->perpage = max(0, $int);
+        $this->perPage = max(0, $int);
 
         return $this;
     }
@@ -255,9 +319,9 @@ class Lister
      * Get quantity of ELements per one page.
      * @return int
      */
-    public function getPerPage()
+    public function getPerPage(): int
     {
-        return $this->perpage;
+        return $this->perPage;
     }
 
     /**
@@ -265,7 +329,7 @@ class Lister
      * @param bool $state
      * @return Lister
      */
-    public function setPersist($state)
+    public function setPersist(bool $state): Lister
     {
         $this->persist = $state;
 
@@ -276,7 +340,7 @@ class Lister
      * Check if list can be stored in session.
      * @return bool
      */
-    public function isPersist()
+    public function isPersist(): bool
     {
         return $this->persist;
     }
@@ -285,7 +349,7 @@ class Lister
      * Get current displayed page.
      * @return int
      */
-    public function getCurrentPage()
+    public function getCurrentPage(): int
     {
         return $this->currentPage;
     }
@@ -294,16 +358,16 @@ class Lister
      * Get current displayed page HTTP GET parameter's name.
      * @return string
      */
-    public function getPageRequestParameterName()
+    public function getPageRequestParameterName(): string
     {
-        return 'p_'.$this->getId();
+        return 'p_' . $this->getId();
     }
 
     /**
      * Get id of list.
      * @return string
      */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
@@ -323,21 +387,23 @@ class Lister
      * @param callable|null $elementCallable Element callable or null if not set
      * @param mixed $elementData ELement data or null if not set
      * @return Lister
+     * @throws \Dszczer\ListerBundle\Filter\FilterException
      */
     public function addField(
-        $name,
-        $label,
-        $sort = false,
-        $filterType = '',
-        $filterMethod = '',
+        string $name,
+        string $label,
+        bool $sort = false,
+        string $filterType = '',
+        string $filterMethod = '',
         $filterValue = null,
         array $filterValues = [],
-        $sorterMethod = '',
+        string $sorterMethod = '',
         $sorterValue = null,
-        $elementMethod = '',
+        string $elementMethod = '',
         $elementCallable = null,
         $elementData = null
-    ) {
+    ): Lister
+    {
         $this->addElement(new Element($name, $label, $elementMethod, $elementCallable, $elementData));
         if ($sort) {
             $this->addSorter(new Sorter($name, $label, $sorterMethod, $sorterValue));
@@ -351,9 +417,9 @@ class Lister
 
     /**
      * Get array of filters.
-     * @return Filter[]|\mixed[]
+     * @return Filter[]|array
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         return $this->filters->all();
     }
@@ -363,7 +429,7 @@ class Lister
      * @param string $name
      * @return Filter|null
      */
-    public function getFilter($name)
+    public function getFilter(string $name)
     {
         return $this->filters->get($name);
     }
@@ -374,7 +440,7 @@ class Lister
      * @param bool $overwrite True for overwrite, false for merge (existing filters wll not be modified)
      * @return Lister
      */
-    public function setFilters(FilterBag $filters, $overwrite = false)
+    public function setFilters(FilterBag $filters, bool $overwrite = false): Lister
     {
         if ($overwrite) {
             $this->filters->replace($filters->all());
@@ -394,7 +460,7 @@ class Lister
      * @param bool $overwrite True for overwrite if exists, false to don't
      * @return Lister
      */
-    public function addFilter(Filter $filter, $overwrite = false)
+    public function addFilter(Filter $filter, bool $overwrite = false): Lister
     {
         if ($overwrite || !$this->hasFilter($filter)) {
             $this->filters->set($filter->getName(), $filter);
@@ -408,7 +474,7 @@ class Lister
      * @param string|Filter $name
      * @return bool
      */
-    public function hasFilter($name)
+    public function hasFilter($name): bool
     {
         return $this->filters->has($name instanceof Filter ? $name->getName() : $name);
     }
@@ -418,7 +484,7 @@ class Lister
      * @param string $name
      * @return Lister
      */
-    public function removeFilter($name)
+    public function removeFilter(string $name): Lister
     {
         $this->filters->remove($name);
 
@@ -427,9 +493,9 @@ class Lister
 
     /**
      * Get array of sorters.
-     * @return Sorter[]|\mixed[]
+     * @return Sorter[]|array
      */
-    public function getSorters()
+    public function getSorters(): array
     {
         return $this->sorters->all();
     }
@@ -439,7 +505,7 @@ class Lister
      * @param string $name
      * @return Sorter|null
      */
-    public function getSorter($name)
+    public function getSorter(string $name)
     {
         return $this->sorters->get($name);
     }
@@ -450,7 +516,7 @@ class Lister
      * @param bool $overwrite True for overwrite, false for merge (existing sorters will not be modified)
      * @return Lister
      */
-    public function setSorters(SorterBag $sorters, $overwrite = false)
+    public function setSorters(SorterBag $sorters, bool $overwrite = false): Lister
     {
         if ($overwrite) {
             $this->sorters->replace($sorters->all());
@@ -470,7 +536,7 @@ class Lister
      * @param bool $overwrite True for overwrite if exists, fals to don't
      * @return Lister
      */
-    public function addSorter(Sorter $sorter, $overwrite = false)
+    public function addSorter(Sorter $sorter, bool $overwrite = false): Lister
     {
         if ($overwrite || !$this->hasSorter($sorter)) {
             $this->sorters->set($sorter->getName(), $sorter);
@@ -484,7 +550,7 @@ class Lister
      * @param string|Sorter $name
      * @return bool
      */
-    public function hasSorter($name)
+    public function hasSorter($name): bool
     {
         return $this->sorters->has($name instanceof Sorter ? $name->getName() : $name);
     }
@@ -494,7 +560,7 @@ class Lister
      * @param string $name
      * @return Lister
      */
-    public function removeSorter($name)
+    public function removeSorter(string $name): Lister
     {
         $this->sorters->remove($name);
 
@@ -503,9 +569,9 @@ class Lister
 
     /**
      * Get array of elements.
-     * @return Element[]|\mixed[]
+     * @return Element[]|array
      */
-    public function getElements()
+    public function getElements(): array
     {
         return $this->elements->all();
     }
@@ -515,7 +581,7 @@ class Lister
      * @param string $name
      * @return Element|null
      */
-    public function getElement($name)
+    public function getElement(string $name)
     {
         return $this->elements->get($name);
     }
@@ -526,7 +592,7 @@ class Lister
      * @param bool $overwrite True for replace, false for merge (existing elements won't be modified)
      * @return Lister
      */
-    public function setElements(ElementBag $elements, $overwrite = false)
+    public function setElements(ElementBag $elements, bool $overwrite = false): Lister
     {
         if ($overwrite) {
             $this->elements->replace($elements->all());
@@ -546,7 +612,7 @@ class Lister
      * @param bool $overwrite True for overwrite if exists, false to don't
      * @return Lister
      */
-    public function addElement(Element $element, $overwrite = false)
+    public function addElement(Element $element, bool $overwrite = false): Lister
     {
         if ($overwrite || !$this->hasElement($element->getName())) {
             $this->elements->set($element->getName(), $element);
@@ -560,7 +626,7 @@ class Lister
      * @param string $name
      * @return bool
      */
-    public function hasElement($name)
+    public function hasElement(string $name): bool
     {
         return $this->elements->has($name);
     }
@@ -570,7 +636,7 @@ class Lister
      * @param string $name
      * @return Lister
      */
-    public function removeElement($name)
+    public function removeElement(string $name): Lister
     {
         $this->elements->remove($name);
 
@@ -582,7 +648,7 @@ class Lister
      * @param bool $raw Raw for bypass stored value, false for fixed Twig path.
      * @return string
      */
-    public function getFilterLayout($raw = false)
+    public function getFilterLayout(bool $raw = false): string
     {
         return $raw ? $this->filterLayout : Helper::fixTwigTemplatePath($this->filterLayout);
     }
@@ -592,7 +658,7 @@ class Lister
      * @param string $filterLayout Twig path to file.
      * @return Lister
      */
-    public function setFilterLayout($filterLayout)
+    public function setFilterLayout(string $filterLayout): Lister
     {
         $this->filterLayout = $filterLayout;
 
@@ -604,7 +670,7 @@ class Lister
      * @param bool $raw Raw for bypass stored value, false for fixed Twig path.
      * @return string
      */
-    public function getListLayout($raw = false)
+    public function getListLayout(bool $raw = false): string
     {
         return $raw ? $this->listLayout : Helper::fixTwigTemplatePath($this->listLayout);
     }
@@ -614,7 +680,7 @@ class Lister
      * @param string $listLayout
      * @return Lister
      */
-    public function setListLayout($listLayout)
+    public function setListLayout(string $listLayout): Lister
     {
         $this->listLayout = $listLayout;
 
@@ -626,7 +692,7 @@ class Lister
      * @param bool $raw Raw for bypass stored value, false for fixed Twig path.
      * @return string
      */
-    public function getElementLayout($raw = false)
+    public function getElementLayout(bool $raw = false): string
     {
         return $raw ? $this->elementLayout : Helper::fixTwigTemplatePath($this->elementLayout);
     }
@@ -636,7 +702,7 @@ class Lister
      * @param string $elementLayout
      * @return Lister
      */
-    public function setElementLayout($elementLayout)
+    public function setElementLayout(string $elementLayout): Lister
     {
         $this->elementLayout = $elementLayout;
 
@@ -648,7 +714,7 @@ class Lister
      * @param bool $raw Raw for bypass stored value, false for fixed Twig path.
      * @return string
      */
-    public function getPaginationLayout($raw = false)
+    public function getPaginationLayout(bool $raw = false): string
     {
         return $raw ? $this->paginationLayout : Helper::fixTwigTemplatePath($this->paginationLayout);
     }
@@ -658,7 +724,7 @@ class Lister
      * @param string $paginationLayout
      * @return Lister
      */
-    public function setPaginationLayout($paginationLayout)
+    public function setPaginationLayout(string $paginationLayout): Lister
     {
         $this->paginationLayout = $paginationLayout;
 
@@ -669,7 +735,7 @@ class Lister
      * Get translation domain.
      * @return string
      */
-    public function getTranslationDomain()
+    public function getTranslationDomain(): string
     {
         return $this->translationDomain;
     }
@@ -679,7 +745,7 @@ class Lister
      * @param string $domain
      * @return Lister
      */
-    public function setTranslationDomain($domain)
+    public function setTranslationDomain(string $domain): Lister
     {
         $this->translationDomain = $domain;
 
@@ -690,7 +756,7 @@ class Lister
      * Get user defined options.
      * @return array
      */
-    public function getCustomOptions()
+    public function getCustomOptions(): array
     {
         return $this->customOptions;
     }
@@ -699,8 +765,9 @@ class Lister
      * Set user defined options.
      * @param array $customOptions
      * @return Lister
+     * @throws ListerException
      */
-    public function setCustomOptions(array $customOptions)
+    public function setCustomOptions(array $customOptions): Lister
     {
         $this->customOptions = $this->resolveCustomOptions($customOptions);
 
@@ -713,7 +780,7 @@ class Lister
      * @return array Resolved options
      * @throws ListerException
      */
-    protected function resolveCustomOptions(array $options)
+    protected function resolveCustomOptions(array $options): array
     {
         $resolver = new OptionsResolver();
         $resolver
@@ -753,7 +820,7 @@ class Lister
      * @param FormBuilder $filterForm
      * @return Lister
      */
-    public function setFilterFormBuilder(FormBuilder $filterForm)
+    public function setFilterFormBuilder(FormBuilder $filterForm): Lister
     {
         $this->filterForm = $filterForm;
 
@@ -764,7 +831,7 @@ class Lister
      * Builds filter form to manipulate list.
      * @return bool True on successful build, false on fail
      */
-    protected function buildFilterForm()
+    protected function buildFilterForm(): bool
     {
         $formBuilder = $this->filterForm;
         if ($formBuilder instanceof FormBuilder && $this->filters->count() > 0) {
@@ -877,7 +944,7 @@ class Lister
      * @param FormBuilder $builder
      * @return Lister
      */
-    public function setSorterFormBuilder(FormBuilder $builder)
+    public function setSorterFormBuilder(FormBuilder $builder): Lister
     {
         $this->sorterFormBuilder = $builder;
 
@@ -889,7 +956,7 @@ class Lister
      * @param Sorter $sorter
      * @return Form
      */
-    protected function buildSorterForm(Sorter $sorter)
+    protected function buildSorterForm(Sorter $sorter): Form
     {
         $formBuilder = clone $this->sorterFormBuilder;
         $formBuilder->add(
@@ -931,7 +998,7 @@ class Lister
      * @param Router $router
      * @return Lister
      */
-    public function setRouter(Router $router)
+    public function setRouter(Router $router): Lister
     {
         $this->router = $router;
 
@@ -942,8 +1009,9 @@ class Lister
      * Handle request to resolve filtering, sorting and pagination.
      * @param Request $request
      * @return bool True on handled request, false on failure
+     * @throws ListerException
      */
-    public function handleRequest(Request $request)
+    public function handleRequest(Request $request): bool
     {
         $handled = $clearFilters = false;
         if ($this->filterForm instanceof Form) {
@@ -1009,8 +1077,12 @@ class Lister
      * @param Request $request Request to resolve.
      * @return Lister
      * @throws ListerException
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Dszczer\ListerBundle\Filter\FilterException
+     * @throws \Dszczer\ListerBundle\Sorter\SorterException
      */
-    public function apply(Request $request)
+    public function apply(Request $request): Lister
     {
         $this->customOptions = $this->resolveCustomOptions($this->customOptions);
 
@@ -1018,16 +1090,21 @@ class Lister
             throw new ListerException('Cannot apply list when filters are defined and form is not built.');
         } elseif (!$this->elements->count()) {
             throw new ListerException('Cannot apply list when there is no defined Elements.');
-        } elseif (!$this->query instanceof ModelCriteria) {
-            throw new ListerException('Cannot apply list without ModelCriteria query object.');
+        } elseif (!$this->query) {
+            throw new ListerException('Cannot apply list without reference to ORM.');
         }
 
         $this->handleRequest($request);
         if ($this->rebuildQuery) {
-            if ($this->externalQuery instanceof ModelCriteria) {
+            if ($this->externalQuery) {
                 $this->query = clone $this->externalQuery;
             } else {
-                $this->query->clear();
+                if ($this->query instanceof ModelCriteria) {
+                    $this->query->clear();
+                }
+                if ($this->query instanceof QueryBuilder) {
+                    $this->query = $this->repository->createQueryBuilder('e');
+                }
             }
             $this->rebuildQuery = false;
         }
@@ -1035,25 +1112,29 @@ class Lister
         /** @var Filter $filter */
         foreach ($this->filters->all() as $filter) {
             $val = $filter->getValue();
+            $extraArgs = [];
             if ($filter->isDefaultMethod() && $filter->getType(false) == Filter::TYPE_TEXT && $val) {
+                $extraArgs = $this->query instanceof ModelCriteria ? [Criteria::LIKE] : ['LIKE'];
                 if (strpos($val, '*') === false) {
                     $filter->setValue("%$val%");
-                    $filter->apply($this, [Criteria::LIKE]);
-                    $filter->setValue(str_replace('%', '', $filter->getValue()));
                 } else {
                     $filter->setValue(str_replace('*', '%', $val));
-                    $filter->apply($this, [Criteria::LIKE]);
-                    $filter->setValue(str_replace('%', '*', $filter->getValue()));
                 }
-            } else {
-                $filter->apply($this);
             }
+            $filter->apply($this, $extraArgs);
+            $filter->setValue($val);
         }
         /** @var Sorter $sorter */
         foreach ($this->sorters->all() as $sorter) {
             $sorter->apply($this);
         }
-        $this->pager = $this->getQuery(false)->paginate($this->currentPage, $this->perpage);
+        if ($this->query instanceof ModelCriteria) {
+            $this->pager = $this->getQuery(false)->paginate($this->currentPage, $this->perPage);
+        } else {
+            $this->pager = new PagerHelper($this->query, $this->getPerPage());
+            $this->pager->setPage($this->getCurrentPage());
+            $this->pager->init();
+        }
         $this->currentPage = max(1, $this->pager->getPage());
 
         if ($request->getSession() instanceof SessionInterface) {
@@ -1066,9 +1147,9 @@ class Lister
     /**
      * Get elements with stored data in them, ready to be displayed.
      * @param mixed $data
-     * @return Element[]
+     * @return Element[]|array
      */
-    public function getHydratedElements($data = null)
+    public function getHydratedElements($data = null): array
     {
         $hydrated = [];
         if ($data === null) {
@@ -1090,7 +1171,7 @@ class Lister
      * @param mixed $data
      * @return Element
      */
-    protected function prepareElement(Element $element, $data)
+    protected function prepareElement(Element $element, $data): Element
     {
         $detached = clone $element;
         $detached->setData($data);
@@ -1099,11 +1180,34 @@ class Lister
     }
 
     /**
+     * Can Lister object be serialized?
+     * @return bool
+     */
+    public function isSerializable(): bool
+    {
+        /** @var Element $element */
+        foreach($this->elements->all() as $element) {
+            if($element->isCustom()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Get array representation of object.
      * @return array
+     * @throws UnserializableException
      */
-    public function serialize()
+    public function serialize(): array
     {
+        if(!$this->isSerializable()) {
+            throw new UnserializableException(
+                "Cannot serialize Lister because of anonymous functions/classes in Element instances"
+            );
+        }
+
         return [
             'id' => $this->id,
             'query' => Helper::encodeAnything($this->query),
@@ -1111,7 +1215,7 @@ class Lister
             'filters' => Helper::encodeAnything($this->filters),
             'sorters' => Helper::encodeAnything($this->sorters),
             'elements' => Helper::encodeAnything($this->elements),
-            'perpage' => $this->perpage,
+            'perpage' => $this->perPage,
             'currentPage' => $this->currentPage,
             'persist' => $this->persist,
             'dynamic' => $this->dynamic,
@@ -1128,6 +1232,7 @@ class Lister
      * Restore array serialized object into self.
      * @param array $data Serialized data
      * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function unserialize(array $data)
     {
@@ -1141,7 +1246,7 @@ class Lister
         }
         if (isset($data['query']) && is_string($data['query'])) {
             $objectOrNull = Helper::decodeAnything($data['query']);
-            if ($objectOrNull instanceof ModelCriteria || $objectOrNull === null) {
+            if ($objectOrNull instanceof ModelCriteria || $objectOrNull instanceof QueryBuilder || $objectOrNull === null) {
                 $this->query = $objectOrNull;
             } else {
                 throw new \InvalidArgumentException('This is not Lister serialized string. Query object is not valid.');
@@ -1149,7 +1254,7 @@ class Lister
         }
         if (isset($data['externalQuery']) && is_string($data['externalQuery'])) {
             $objectOrNull = Helper::decodeAnything($data['externalQuery']);
-            if ($objectOrNull instanceof ModelCriteria || $objectOrNull === null) {
+            if ($objectOrNull instanceof ModelCriteria || $objectOrNull instanceof QueryBuilder || $objectOrNull === null) {
                 $this->externalQuery = $objectOrNull;
             } else {
                 throw new \InvalidArgumentException(
@@ -1182,7 +1287,7 @@ class Lister
             }
         }
         if (isset($data['perpage']) && is_int($data['perpage'])) {
-            $this->perpage = $data['perpage'];
+            $this->perPage = $data['perpage'];
         } else {
             throw new \InvalidArgumentException(
                 'This is not Lister serialized string. Missing or invalid "perpage" property.'

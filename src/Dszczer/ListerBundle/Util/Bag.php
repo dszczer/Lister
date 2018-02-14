@@ -1,15 +1,18 @@
 <?php
 /**
  * Bag class representation.
- * @category     Utils
- * @author       Damian Szczerbiński <dszczer@gmail.com>
+ * @category Utils
+ * @author   Damian Szczerbiński <dszczer@gmail.com>
+ * @author   Fabien Potencier <fabien@symfony.com>
  */
 
 namespace Dszczer\ListerBundle\Util;
 
 /**
  * Class Bag
+ * @see \Symfony\Component\HttpFoundation\ParameterBag
  * @package Dszczer\ListerBundle
+ * @since 0.9
  */
 class Bag implements \IteratorAggregate, \Countable
 {
@@ -47,7 +50,7 @@ class Bag implements \IteratorAggregate, \Countable
      * Returns the array keys.
      * @return string[] An array of array keys
      */
-    public function keys()
+    public function keys(): array
     {
         return array_keys($this->array);
     }
@@ -89,7 +92,7 @@ class Bag implements \IteratorAggregate, \Countable
      * @param string $key The key
      * @param mixed $value The value
      */
-    public function set($key, $value)
+    public function set(string $key, $value)
     {
         $this->validateInstance($value);
         $this->array[$key] = $value;
@@ -100,7 +103,7 @@ class Bag implements \IteratorAggregate, \Countable
      * @param string $key The key
      * @return bool true if the parameter exists, false otherwise
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         return array_key_exists($key, $this->array);
     }
@@ -109,7 +112,7 @@ class Bag implements \IteratorAggregate, \Countable
      * Removes a parameter.
      * @param string $key The key
      */
-    public function remove($key)
+    public function remove(string $key)
     {
         unset($this->array[$key]);
     }
@@ -118,7 +121,7 @@ class Bag implements \IteratorAggregate, \Countable
      * Returns an iterator for array.
      * @return \ArrayIterator An \ArrayIterator instance
      */
-    public function getIterator()
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->array);
     }
@@ -127,7 +130,7 @@ class Bag implements \IteratorAggregate, \Countable
      * Returns the number of array.
      * @return int The number of array
      */
-    public function count()
+    public function count(): int
     {
         return count($this->array);
     }
@@ -136,7 +139,7 @@ class Bag implements \IteratorAggregate, \Countable
      * Get class name to validate against.
      * @return string
      */
-    public function getInstanceValidator()
+    public function getInstanceValidator(): string
     {
         return $this->instanceValidator;
     }
@@ -146,7 +149,7 @@ class Bag implements \IteratorAggregate, \Countable
      * @param string $instanceValidator
      * @throws \InvalidArgumentException
      */
-    public function setInstanceValidator($instanceValidator)
+    public function setInstanceValidator(string $instanceValidator)
     {
         $this->instanceValidator = $instanceValidator;
         if ($this->count() > 0) {
