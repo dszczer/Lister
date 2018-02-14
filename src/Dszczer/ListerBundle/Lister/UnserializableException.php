@@ -10,7 +10,7 @@ namespace Dszczer\ListerBundle\Lister;
 /**
  * Class UnserializableException
  * @package Dszczer\ListerBundle\Lister
- * @since 0.9.1
+ * @since 0.9.2
  */
 class UnserializableException extends \RuntimeException
 {

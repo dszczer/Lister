@@ -21,7 +21,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
  * The code from this class heavily borrows from PropelModelPager class.
  *
  * @see \Propel\Runtime\Util\PropelModelPager
- * @since 0.9.1
+ * @since 0.9.2
  */
 class PagerHelper implements \IteratorAggregate, \Countable
 {
