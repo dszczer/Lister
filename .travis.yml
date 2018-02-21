@@ -2,5 +2,12 @@ language: php
 php:
   - nightly
 install: composer install
-before_script: phpenv config-add tests/phpconfig.ini
+env:
+  - TRAVIS=1
+before_script:
+  - vendor/bin/propel --config-dir="$(pwd)/tests" config:convert
+  - vendor/bin/propel --config-dir="$(pwd)/tests" model:build
+  - vendor/bin/propel --config-dir="$(pwd)/tests" migration:diff
+  - vendor/bin/propel --config-dir="$(pwd)/tests" migration:migrate
+  - rm -rf "$(pwd)/tests/Propel/Migration"
 script: phpunit -c phpunit.xml

@@ -86,25 +86,30 @@ namespace Dszczer\ListerBundle\TestInventory {
     /**
      * Database fixture
      */
-    $cmdBinDir = sprintf(
-        'sudo cd "%s" && sudo %s',
-        escapeshellarg(ROOTDIR . '/../vendor/bin'),
-        escapeshellcmd('propel' . (IS_WINDOWS ? '.bat' : ''))
-    );
-    $cmdConfigDir = '--config-dir="' . escapeshellarg(ROOTDIR) . '"';
-    exec(sprintf('%s config:convert %s', $cmdBinDir, $cmdConfigDir));
+    if(!getenv('TRAVIS')) {
+        $cmdBinDir = sprintf(
+            'cd "%s" && %s',
+            escapeshellarg(ROOTDIR . '/../vendor/bin'),
+            escapeshellcmd('propel' . (IS_WINDOWS ? '.bat' : ''))
+        );
+        $cmdConfigDir = '--config-dir="' . escapeshellarg(ROOTDIR) . '"';
+        exec(sprintf('%s config:convert %s', $cmdBinDir, $cmdConfigDir));
+
+        // build classes
+        exec(sprintf('%s model:build %s', $cmdBinDir, $cmdConfigDir));
+        // migrate (create tables)
+        exec(sprintf('%s migration:diff %s', $cmdBinDir, $cmdConfigDir));
+        exec(sprintf('%s migration:migrate %s', $cmdBinDir, $cmdConfigDir));
+
+        // cleanup after migration
+        foreach (glob(ROOTDIR . '/Propel/Migration/*') as $mfile) {
+            unlink($mfile);
+        }
+    }
+
     // init connection
     Propel::init(ROOTDIR . '/Propel/Runtime/config.php');
     $conn = Propel::getConnection();
-    // build classes
-    exec(sprintf('%s model:build %s', $cmdBinDir, $cmdConfigDir));
-    // migrate (create tables)
-    exec(sprintf('%s migration:diff %s', $cmdBinDir, $cmdConfigDir));
-    exec(sprintf('%s migration:migrate %s', $cmdBinDir, $cmdConfigDir));
-    // cleanup after migration
-    foreach (glob(ROOTDIR . '/Propel/Migration/*') as $mfile) {
-        unlink($mfile);
-    }
 
     // insert test data only if database is empty
     if (AuthorQuery::create()->count($conn) == 0) {
