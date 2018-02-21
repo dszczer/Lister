@@ -87,7 +87,7 @@ namespace Dszczer\ListerBundle\TestInventory {
      * Database fixture
      */
     $cmdBinDir = sprintf(
-        'cd "%s" && %s',
+        'sudo cd "%s" && sudo %s',
         escapeshellarg(ROOTDIR . '/../vendor/bin'),
         escapeshellcmd('propel' . (IS_WINDOWS ? '.bat' : ''))
     );
