@@ -1,5 +1,7 @@
 # Lister Bundle
 
+[![Build Status](https://travis-ci.org/dszczer/Lister.svg?branch=master)](https://travis-ci.org/dszczer/Lister)
+
 ###### Disclaimer: documentation and test suit is not complete. This bundle is in development stage.
 
 ## Requirements
