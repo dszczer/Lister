@@ -5,7 +5,10 @@
 vendor/
 
 # Propel runtime config
-/tests/Propel
+/tests/Propel/Dszczer/ListerBundle/Base
+/tests/Propel/Dszczer/ListerBundle/Map
+/tests/Propel/Runtime
+/tests/Propel/Migration
 
 # Database
 /tests/test.sq3
