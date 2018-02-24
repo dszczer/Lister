@@ -85,18 +85,18 @@ class Factory
         $persistentManagerName = null
     ): Lister
     {
+        // determine ORM engine
+        $orm = $this->config['orm'];
+        if ($orm === 'auto') {
+            $orm = is_subclass_of($queryClassNameOrRepositoryName, ModelCriteria::class)
+                ? 'propel'
+                : 'doctrine';
+        }
         $list = null;
         if ($this->request instanceof Request && $this->request->hasSession()) {
             $list = Lister::getFromSession($this->request->getSession(), $id);
         }
         if (!$list instanceof Lister) {
-            // determine ORM engine
-            $orm = $this->config['orm'];
-            if ($orm === 'auto') {
-                $orm = is_subclass_of($queryClassNameOrRepositoryName, ModelCriteria::class)
-                    ? 'propel'
-                    : 'doctrine';
-            }
             if ($orm === 'doctrine') {
                 if (!$this->doctrine instanceof Registry) {
                     throw new ListerException("Cannot use Doctrine, ORM not detected");
@@ -111,6 +111,8 @@ class Factory
             if (!empty($translationDomain)) {
                 $list->setTranslationDomain($translationDomain);
             }
+        } elseif($orm === 'doctrine') {
+            $list->setRepository($this->doctrine->getRepository($queryClassNameOrRepositoryName, $persistentManagerName));
         }
 
         $formOptions = ['translation_domain' => $list->getTranslationDomain()];

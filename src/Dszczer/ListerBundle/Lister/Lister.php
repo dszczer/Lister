@@ -1209,8 +1209,8 @@ class Lister
 
         return [
             'id' => $this->id,
-            'query' => Helper::encodeAnything($this->query),
-            'externalQuery' => Helper::encodeAnything($this->externalQuery),
+            'query' => $this->externalQuery instanceof ModelCriteria ? Helper::encodeAnything($this->query) : null,
+            'externalQuery' => $this->externalQuery instanceof ModelCriteria ? Helper::encodeAnything($this->externalQuery) : null,
             'filters' => Helper::encodeAnything($this->filters),
             'sorters' => Helper::encodeAnything($this->sorters),
             'elements' => Helper::encodeAnything($this->elements),
@@ -1245,7 +1245,7 @@ class Lister
         }
         if (isset($data['query']) && is_string($data['query'])) {
             $objectOrNull = Helper::decodeAnything($data['query']);
-            if ($objectOrNull instanceof ModelCriteria || $objectOrNull instanceof QueryBuilder || $objectOrNull === null) {
+            if ($objectOrNull instanceof ModelCriteria || $objectOrNull === null) {
                 $this->query = $objectOrNull;
             } else {
                 throw new \InvalidArgumentException('This is not Lister serialized string. Query object is not valid.');
@@ -1253,7 +1253,7 @@ class Lister
         }
         if (isset($data['externalQuery']) && is_string($data['externalQuery'])) {
             $objectOrNull = Helper::decodeAnything($data['externalQuery']);
-            if ($objectOrNull instanceof ModelCriteria || $objectOrNull instanceof QueryBuilder || $objectOrNull === null) {
+            if ($objectOrNull instanceof ModelCriteria || $objectOrNull === null) {
                 $this->externalQuery = $objectOrNull;
             } else {
                 throw new \InvalidArgumentException(
