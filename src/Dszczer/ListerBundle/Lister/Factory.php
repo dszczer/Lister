@@ -113,6 +113,7 @@ class Factory
             }
         } elseif($orm === 'doctrine') {
             $list->setRepository($this->doctrine->getRepository($queryClassNameOrRepositoryName, $persistentManagerName));
+            $list->setQuery($list->getRepository()->createQueryBuilder('e'));
         }
 
         $formOptions = ['translation_domain' => $list->getTranslationDomain()];
