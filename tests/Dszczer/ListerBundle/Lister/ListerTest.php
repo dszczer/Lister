@@ -15,6 +15,9 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ListerTest extends ListerTestCase
 {
+    /** @var array */
+    private static $serializedLister;
+
     /**
      * @throws ListerException
      */
@@ -187,6 +190,38 @@ class ListerTest extends ListerTestCase
         $container = static::$myKernel->getContainer();
         $lister = $container->get('lister.factory')->createList(AuthorQuery::class);
         $lister->addField('firstName', 'Author name', true, '', '', null, [], '', 'ASC');
+        $lister->apply(Request::create('/'));
+    }
+
+    /**
+     * @depends testBlankApply
+     * @throws ListerException
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Dszczer\ListerBundle\Filter\FilterException
+     * @throws \Dszczer\ListerBundle\Sorter\SorterException
+     * @throws \Exception
+     */
+    public function testSerializingList()
+    {
+        $container = static::$myKernel->getContainer();
+        $lister = $container->get('lister.factory')->createList('DszczerListerBundle:Author');
+        $lister->addField('firstName', 'Author name', true, '', '', null, [], '', 'ASC');
+        $lister->apply(Request::create('/'));
+        self::$serializedLister = $lister->serialize();
+    }
+
+    /**
+     * @depends testSerializingList
+     * @throws \Exception
+     */
+    public function testUnserializingList()
+    {
+        $container = static::$myKernel->getContainer();
+        $lister = new Lister();
+        $lister->unserialize(self::$serializedLister);
+        $lister->setRepository($container->get('doctrine')->getRepository('DszczerListerBundle:Author'));
+        $lister->setQuery($lister->getRepository()->createQueryBuilder('e'));
         $lister->apply(Request::create('/'));
     }
 }
