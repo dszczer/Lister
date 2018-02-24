@@ -202,6 +202,53 @@ class ListerTest extends ListerTestCase
      * @throws \Dszczer\ListerBundle\Sorter\SorterException
      * @throws \Exception
      */
+    public function testGetHydratedElements()
+    {
+        $container = static::$myKernel->getContainer();
+        $lister = $container->get('lister.factory')->createList('DszczerListerBundle:Author');
+        $lister->addField('firstName', 'Author name', true, '', '', null, [], '', 'ASC');
+        $lister->apply(Request::create('/'));
+        $lister->getHydratedElements();
+    }
+
+    /**
+     * @depends testGetHydratedElements
+     * @throws ListerException
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Dszczer\ListerBundle\Filter\FilterException
+     * @throws \Dszczer\ListerBundle\Sorter\SorterException
+     * @throws \Exception
+     */
+    public function testViewTable()
+    {
+        $container = static::$myKernel->getContainer();
+        $request = Request::create('/');
+
+        $lister = $container->get('lister.factory')->createList('DszczerListerBundle:Author');
+        $lister->addField('firstName', 'Author name', true, '', '', null, [], '', 'ASC');
+        $lister->apply($request);
+        $lister->getHydratedElements();
+        $container->get('twig')->render(
+            '@DszczerLister/Lister/table.html.twig',
+            [
+                'list' => $lister,
+                'app' => [
+                    'request' => $request
+                ]
+            ]
+        );
+    }
+
+    /**
+     * @depends testBlankApply
+     * @throws ListerException
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Dszczer\ListerBundle\Filter\FilterException
+     * @throws \Dszczer\ListerBundle\Sorter\SorterException
+     * @throws \Exception
+     */
     public function testSerializingList()
     {
         $container = static::$myKernel->getContainer();

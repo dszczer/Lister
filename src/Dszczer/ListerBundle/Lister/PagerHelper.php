@@ -135,7 +135,7 @@ class PagerHelper implements \IteratorAggregate, \Countable
         if (0 === $this->getPage() || 0 === $this->getMaxPerPage()) {
             $this->setLastPage(0);
         } else {
-            $this->setLastPage((int)ceil($this->getNbResults() / $this->getMaxPerPage()));
+            $this->setLastPage(min(1, (int)ceil($this->getNbResults() / $this->getMaxPerPage())));
 
             $offset = ($this->getPage() - 1) * $this->getMaxPerPage();
             if ($this->query instanceof ModelCriteria) {

@@ -1130,7 +1130,7 @@ class Lister
         if ($this->query instanceof ModelCriteria) {
             $this->pager = $this->getQuery(false)->paginate($this->currentPage, $this->perPage);
         } else {
-            $this->pager = new PagerHelper($this->query, $this->getPerPage());
+            $this->pager = new PagerHelper($this->query, $this->perPage);
             $this->pager->setPage($this->getCurrentPage());
             $this->pager->init();
         }

@@ -13,7 +13,7 @@
     </tr>
     </thead>
     <tbody>
-    {% for elements in list.hydratedElements if results.count > 0 %}
+    {% for elements in list.hydratedElements if list.pager.results|length > 0 %}
         {% include list.elementLayout with {elements: elements, row: elements[0].data(true)} %}
     {%  else %}
         <tr><td colspan="{{ list.elements|length }}">{{ 'List is empty'|trans([], list.translationDomain) }}</td></tr>
