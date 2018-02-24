@@ -194,6 +194,24 @@ class ListerTest extends ListerTestCase
     }
 
     /**
+     * @depends testBlankDoctrineApply
+     * @throws ListerException
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Dszczer\ListerBundle\Filter\FilterException
+     * @throws \Dszczer\ListerBundle\Sorter\SorterException
+     * @throws \Exception
+     */
+    public function testDoctrineGetHydratedElements()
+    {
+        $container = static::$myKernel->getContainer();
+        $lister = $container->get('lister.factory')->createList('DszczerListerBundle:Author');
+        $lister->addField('firstName', 'Author name', true, '', '', null, [], '', 'ASC');
+        $lister->apply(Request::create('/'));
+        $lister->getHydratedElements();
+    }
+
+    /**
      * @depends testBlankApply
      * @throws ListerException
      * @throws \Doctrine\ORM\NoResultException
@@ -205,14 +223,14 @@ class ListerTest extends ListerTestCase
     public function testGetHydratedElements()
     {
         $container = static::$myKernel->getContainer();
-        $lister = $container->get('lister.factory')->createList('DszczerListerBundle:Author');
+        $lister = $container->get('lister.factory')->createList(AuthorQuery::class);
         $lister->addField('firstName', 'Author name', true, '', '', null, [], '', 'ASC');
         $lister->apply(Request::create('/'));
         $lister->getHydratedElements();
     }
 
     /**
-     * @depends testGetHydratedElements
+     * @depends testDoctrineGetHydratedElements
      * @throws ListerException
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
@@ -220,7 +238,7 @@ class ListerTest extends ListerTestCase
      * @throws \Dszczer\ListerBundle\Sorter\SorterException
      * @throws \Exception
      */
-    public function testViewTable()
+    public function testDoctrineViewTable()
     {
         $container = static::$myKernel->getContainer();
         $request = Request::create('/');
@@ -241,7 +259,7 @@ class ListerTest extends ListerTestCase
     }
 
     /**
-     * @depends testBlankApply
+     * @depends testGetHydratedElements
      * @throws ListerException
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
@@ -249,7 +267,98 @@ class ListerTest extends ListerTestCase
      * @throws \Dszczer\ListerBundle\Sorter\SorterException
      * @throws \Exception
      */
-    public function testSerializingList()
+    public function testViewTable()
+    {
+        $container = static::$myKernel->getContainer();
+        $request = Request::create('/');
+
+        $lister = $container->get('lister.factory')->createList(AuthorQuery::class);
+        $lister->addField('firstName', 'Author name', true, '', '', null, [], '', 'ASC');
+        $lister->apply($request);
+        $lister->getHydratedElements();
+        $container->get('twig')->render(
+            '@DszczerLister/Lister/table.html.twig',
+            [
+                'list' => $lister,
+                'app' => [
+                    'request' => $request
+                ]
+            ]
+        );
+    }
+
+    /**
+     * @depends testGetHydratedElements
+     * @throws ListerException
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Dszczer\ListerBundle\Filter\FilterException
+     * @throws \Dszczer\ListerBundle\Sorter\SorterException
+     * @throws \Exception
+     */
+    public function testNoResults()
+    {
+        static::deleteAllBooks();
+        $container = static::$myKernel->getContainer();
+        $request = Request::create('/');
+
+        $lister = $container->get('lister.factory')->createList(BookQuery::class);
+        $lister->addField('title', 'Title');
+        $lister->apply($request);
+        $lister->getHydratedElements();
+        $container->get('twig')->render(
+            '@DszczerLister/Lister/table.html.twig',
+            [
+                'list' => $lister,
+                'app' => [
+                    'request' => $request
+                ]
+            ]
+        );
+        static::createBooks(50);
+    }
+
+    /**
+     * @depends testDoctrineGetHydratedElements
+     * @throws ListerException
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Dszczer\ListerBundle\Filter\FilterException
+     * @throws \Dszczer\ListerBundle\Sorter\SorterException
+     * @throws \Exception
+     */
+    public function testDoctrineNoResults()
+    {
+        static::deleteAllBooks();
+        $container = static::$myKernel->getContainer();
+        $request = Request::create('/');
+
+        $lister = $container->get('lister.factory')->createList('DszczerListerBundle:Book');
+        $lister->addField('title', 'Title');
+        $lister->apply($request);
+        $lister->getHydratedElements();
+        $container->get('twig')->render(
+            '@DszczerLister/Lister/table.html.twig',
+            [
+                'list' => $lister,
+                'app' => [
+                    'request' => $request
+                ]
+            ]
+        );
+        static::createBooks(50);
+    }
+
+    /**
+     * @depends testBlankDoctrineApply
+     * @throws ListerException
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Dszczer\ListerBundle\Filter\FilterException
+     * @throws \Dszczer\ListerBundle\Sorter\SorterException
+     * @throws \Exception
+     */
+    public function testDoctrineSerializingList()
     {
         $container = static::$myKernel->getContainer();
         $lister = $container->get('lister.factory')->createList('DszczerListerBundle:Author');
@@ -259,10 +368,10 @@ class ListerTest extends ListerTestCase
     }
 
     /**
-     * @depends testSerializingList
+     * @depends testDoctrineSerializingList
      * @throws \Exception
      */
-    public function testUnserializingList()
+    public function testDoctrineUnserializingList()
     {
         $container = static::$myKernel->getContainer();
         $lister = new Lister();
