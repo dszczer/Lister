@@ -16,7 +16,6 @@ use Dszczer\ListerBundle\Filter\FilterBag;
 use Dszczer\ListerBundle\Sorter\Sorter;
 use Dszczer\ListerBundle\Sorter\SorterBag;
 use Dszczer\ListerBundle\Util\Helper;
-use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -974,10 +973,10 @@ class Lister
             default:
                 $class = '';
                 break;
-            case Criteria::ASC:
+            case 'ASC':
                 $class = 'sort-asc';
                 break;
-            case Criteria::DESC:
+            case 'DESC':
                 $class = 'sort-desc';
                 break;
         }
@@ -1049,8 +1048,8 @@ class Lister
                 if ($this->hasSorter($sorterName)) {
                     $clickedSorter = $this->getSorter($sorterName);
                     $sort = empty($clickedSorter->getValue())
-                        ? Criteria::ASC
-                        : ($clickedSorter->getValue() == Criteria::ASC ? Criteria::DESC : Criteria::ASC);
+                        ? 'ASC'
+                        : ($clickedSorter->getValue() == 'ASC' ? 'DESC' : 'ASC');
                     $clickedSorter->setValue($sort);
                     foreach ($this->getSorters() as $clearSort) {
                         if ($clearSort->getName() === $sorterName) {
@@ -1114,7 +1113,7 @@ class Lister
             $val = $filter->getValue();
             $extraArgs = [];
             if ($filter->isDefaultMethod() && $filter->getType(false) == Filter::TYPE_TEXT && $val) {
-                $extraArgs = $this->query instanceof ModelCriteria ? [Criteria::LIKE] : ['LIKE'];
+                $extraArgs = $this->query instanceof ModelCriteria ? [' LIKE '] : ['LIKE'];
                 if (strpos($val, '*') === false) {
                     $filter->setValue("%$val%");
                 } else {
